@@ -8,7 +8,7 @@ import { isCode, isCustomContainerConfig } from '../interface/function';
 
 export default class Component {
   static client: any;
-  @HLogger('FC-SDK') static logger: ILogger;
+  @HLogger('FC-BASE-SDK') static logger: ILogger;
 
   static async remove(props: IProperties, { nonOptionsArg, name }) {
     const { service, function: functionConfig, triggers } = props;

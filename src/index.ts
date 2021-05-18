@@ -6,7 +6,7 @@ import Resources from './resources';
 import { REMOVE_HELP_INFO } from './static';
 
 export default class Component {
-  @HLogger('FC-SDK') logger: ILogger;
+  @HLogger('FC-BASE-SDK') logger: ILogger;
 
   initInputs(inputs: IInputProps) {
     this.logger.debug(inputs.props);
