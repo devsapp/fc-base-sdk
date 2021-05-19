@@ -1,5 +1,6 @@
 import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
+import _ from 'lodash';
 // import path from 'path';
 import Client from '../utils/client';
 import { transfromTriggerConfig } from '../utils/utils';
@@ -173,6 +174,9 @@ export default class Component {
       throw new Error(`${serviceName}/${functionName} code is not configured.`);
     }
 
+    if (functionConfig.environmentVariables) {
+      functionConfig.environmentVariables = _.mapValues(functionConfig.environmentVariables, value => value.toString());
+    }
 
     let res;
     try {

@@ -18,6 +18,8 @@ services:
         memorySize: 128
         runtime: nodejs12
         timeout: 60
+        layers:
+          - ${layerId}#${layersName}#${layersVersion}
       triggers:
         - name: timerTrigger
           function: fc-base-component-function-two
@@ -81,3 +83,8 @@ services:
               domain:
                 - 'www.taobao.com'
                 - 'www.tmall.com'
+        - name: otsTrigger
+          type: tablestore
+          config:
+            instanceName: ${instanceName}
+            tableName: ${tableName}

@@ -1,4 +1,4 @@
-import { ILogger, HLogger, commandParse, help } from '@serverless-devs/core';
+import { ILogger, HLogger, commandParse, help, getCredential, reportComponent } from '@serverless-devs/core';
 import { IInputProps } from './interface/inputs';
 import Client from './utils/client';
 import _ from 'lodash';
@@ -8,10 +8,19 @@ import { REMOVE_HELP_INFO } from './static';
 export default class Component {
   @HLogger('FC-BASE-SDK') logger: ILogger;
 
-  initInputs(inputs: IInputProps) {
+  async initInputs(inputs: IInputProps, command: string) {
     this.logger.debug(inputs.props);
 
     const { region } = inputs.props;
+    if (!inputs.credentials) {
+      inputs.credentials = await getCredential(inputs.project.access);
+    }
+
+    reportComponent('FC-BASE-SDK', {
+      command,
+      uid: inputs.credentials.AccountID,
+    });
+
     Client.setFcClient(region, inputs.credentials);
 
     this.logger.debug(JSON.stringify(_.pick(inputs, ['props', 'appName', 'project', 'args']), null, '  '));
@@ -19,13 +28,13 @@ export default class Component {
   }
 
   async deploy(inputs: IInputProps) {
-    const newInputs = this.initInputs(_.cloneDeep(inputs));
+    const newInputs = await this.initInputs(_.cloneDeep(inputs), 'deploy');
 
     return await Resources.deploy(newInputs.props);
   }
 
   async remove(inputs: IInputProps) {
-    const { args, props } = this.initInputs(_.cloneDeep(inputs));
+    const { args, props } = await this.initInputs(_.cloneDeep(inputs), 'remove');
 
     const apts = {
       boolean: ['help', 'assumeYes'],
