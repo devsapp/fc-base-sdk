@@ -7,6 +7,8 @@ import { transfromTriggerConfig } from '../utils/utils';
 import { IProperties } from '../interface/inputs';
 import { isCode, isCustomContainerConfig } from '../interface/function';
 
+const errorCode = ['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'];
+
 export default class Component {
   static client: any;
   @HLogger('FC-BASE-SDK') static logger: ILogger;
@@ -34,7 +36,7 @@ export default class Component {
           await Client.fcClient.deleteTrigger(serviceName, functionName, triggerName);
           vm.succeed(`Delete trigger ${serviceName}/${functionName}/${triggerName} success.`);
         } catch (ex) {
-          if (['ServiceNotFound', 'TriggerNotFound'].includes(ex.code)) {
+          if (errorCode.includes(ex.code)) {
             vm.warn(`[${ex.code}], ${ex.message}`);
             continue;
           }
@@ -53,7 +55,7 @@ export default class Component {
         await Client.fcClient.deleteFunction(serviceName, functionName);
         vm.succeed(`Delete function ${serviceName}/${functionName} success.`);
       } catch (ex) {
-        if (ex.code !== 'ServiceNotFound') {
+        if (!errorCode.includes(ex.code)) {
           vm.fail();
           throw ex;
         }
@@ -67,7 +69,7 @@ export default class Component {
         await Client.fcClient.deleteService(serviceName);
         vm.succeed(`Delete service ${serviceName} success.`);
       } catch (ex) {
-        if (ex.code !== 'ServiceNotFound') {
+        if (!errorCode.includes(ex.code)) {
           vm.fail();
           throw ex;
         }
