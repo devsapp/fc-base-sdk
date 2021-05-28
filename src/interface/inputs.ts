@@ -37,5 +37,5 @@ export interface ICredentials {
   ClientID?: string;
   ClientSecret?: string;
   PrivateKeyData?: string;
-
+  SecurityToken?: string;
 }

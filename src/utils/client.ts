@@ -9,11 +9,13 @@ export default class Client {
       AccountID,
       AccessKeyID,
       AccessKeySecret,
+      SecurityToken,
     } = credentials;
 
     const fcClient = new FC(AccountID, {
       accessKeyID: AccessKeyID,
       accessKeySecret: AccessKeySecret,
+      securityToken: SecurityToken,
       region,
       timeout: 6000000,
     });

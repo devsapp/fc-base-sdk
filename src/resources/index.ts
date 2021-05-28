@@ -113,6 +113,8 @@ export default class Component {
     if (!nasConfig) {
       serviceConfig.nasConfig = {
         mountPoints: [],
+        userId: -1,
+        groupId: -1,
       };
     }
     if (!vpcConfig) {
