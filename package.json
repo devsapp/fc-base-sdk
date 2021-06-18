@@ -1,10 +1,11 @@
 {
   "name": "fc-base-sdk",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "./dist/index.js",
   "dependencies": {
-    "@serverless-devs/core": "^0.0.x",
     "@alicloud/fc2": "^2.2.2",
+    "@alicloud/pop-core": "^1.7.10",
+    "@serverless-devs/core": "^0.0.x",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "webpack-cli": "^4.4.0"
   },
   "scripts": {
+    "start": "npm run watch",
     "watch": "npx tsc -w -p tsconfig.json",
     "prebuild": "rimraf dist",
     "build": "npx tsc -p tsconfig.json",
