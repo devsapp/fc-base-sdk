@@ -6,17 +6,18 @@ import Client from '../utils/client';
 import { transfromTriggerConfig } from '../utils/utils';
 import { IProperties } from '../interface/inputs';
 import { isCode, isCustomContainerConfig } from '../interface/function';
+import { makeDestination } from './function-async-config';
 
 const errorCode = ['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'];
 
 export default class Component {
-  static client: any;
   @HLogger('FC-BASE-SDK') static logger: ILogger;
 
   static async remove(props: IProperties, { nonOptionsArg, name }) {
     const { service, function: functionConfig, triggers } = props;
     const serviceName = service.name;
     const functionName = functionConfig?.name;
+    const fcClient = Client.fcClient();
 
     const deleteService = nonOptionsArg === 'service';
     const deleteFunction = nonOptionsArg === 'function' || deleteService;
@@ -33,7 +34,7 @@ export default class Component {
         }
         const vm = spinner(`Delete trigger ${serviceName}/${functionName}/${triggerName}...`);
         try {
-          await Client.fcClient.deleteTrigger(serviceName, functionName, triggerName);
+          await fcClient.deleteTrigger(serviceName, functionName, triggerName);
           vm.succeed(`Delete trigger ${serviceName}/${functionName}/${triggerName} success.`);
         } catch (ex) {
           if (errorCode.includes(ex.code)) {
@@ -52,7 +53,7 @@ export default class Component {
     if (functionName && deleteFunction) {
       const vm = spinner(`Delete function ${serviceName}/${functionName}...`);
       try {
-        await Client.fcClient.deleteFunction(serviceName, functionName);
+        await fcClient.deleteFunction(serviceName, functionName);
         vm.succeed(`Delete function ${serviceName}/${functionName} success.`);
       } catch (ex) {
         if (!errorCode.includes(ex.code)) {
@@ -66,7 +67,7 @@ export default class Component {
     if (deleteService) {
       const vm = spinner(`Delete service ${serviceName}...`);
       try {
-        await Client.fcClient.deleteService(serviceName);
+        await fcClient.deleteService(serviceName);
         vm.succeed(`Delete service ${serviceName} success.`);
       } catch (ex) {
         if (!errorCode.includes(ex.code)) {
@@ -81,21 +82,22 @@ export default class Component {
   static async deploy(props: IProperties): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
     const serviceName = service.name;
+    const fcClient = Client.fcClient();
 
-    await this.makeService(serviceName, service);
+    await this.makeService(fcClient, serviceName, service);
 
     if (functionConfig) {
-      await this.makeFunction(serviceName, functionConfig.name, functionConfig);
+      await this.makeFunction(fcClient, serviceName, functionConfig.name, functionConfig);
     }
 
     if (triggers) {
       for (const triggerConfig of triggers) {
-        await this.makeTrigger(serviceName, triggerConfig.function, transfromTriggerConfig(triggerConfig, region, Client.fcClient.accountid));
+        await this.makeTrigger(fcClient, serviceName, triggerConfig.function, transfromTriggerConfig(triggerConfig, region, Client.credentials.AccountID));
       }
     }
   }
 
-  static async makeService(name, serviceConfig) {
+  static async makeService(fcClient, name, serviceConfig) {
     const {
       vpcConfig,
       nasConfig,
@@ -107,6 +109,7 @@ export default class Component {
         project: '',
         logstore: '',
         enableRequestMetrics: false,
+        enableInstanceMetrics: false,
       };
     }
 
@@ -125,11 +128,28 @@ export default class Component {
       };
     }
 
+    if (serviceConfig.tracingConfig === 'Enable') {
+      const xtraceClient = Client.xtraceClient();
+      try {
+        const { Token: token } = await xtraceClient.request('GetToken', {}, {});
+        serviceConfig.tracingConfig = {
+          type: 'Jaeger',
+          params: {
+            endpoint: `${token.InternalDomain}/adapt_${token.LicenseKey}_${token.Pid}/api/traces`
+          }
+        };
+      } catch (e) {
+        throw new Error(e.message);
+      }
+    } else {
+      serviceConfig.tracingConfig = {};
+    }
+
     const vm = spinner(`Make service ${name}...`);
 
     let res;
     try {
-      res = await Client.fcClient.createService(name, serviceConfig);
+      res = await fcClient.createService(name, serviceConfig);
     } catch (ex) {
       if (ex.code !== 'ServiceAlreadyExists') {
         this.logger.debug(`ex code: ${ex.code}, ex: ${ex.message}`);
@@ -137,7 +157,7 @@ export default class Component {
         throw ex;
       }
       try {
-        res = await Client.fcClient.updateService(name, serviceConfig);
+        res = await fcClient.updateService(name, serviceConfig);
       } catch (e) {
         vm.fail();
         throw e;
@@ -148,7 +168,7 @@ export default class Component {
     return res;
   }
 
-  static async makeFunction(serviceName, functionName, functionConfig) {
+  static async makeFunction(fcClient, serviceName, functionName, functionConfig) {
     const vm = spinner(`Make function ${serviceName}/${functionName}...`);
 
     const {
@@ -157,7 +177,10 @@ export default class Component {
       customContainerConfig,
       ossBucket,
       ossKey,
+      asyncConfiguration,
+      instanceLifecycleConfig,
     } = functionConfig;
+    delete functionConfig.asyncConfiguration;
 
     if (filename) {
       functionConfig.code = {
@@ -168,6 +191,14 @@ export default class Component {
         ossBucketName: ossBucket,
         ossObjectName: ossKey,
       };
+    }
+
+    const emptyProp = {
+      'handler': ''
+    };
+    functionConfig.instanceLifecycleConfig = {
+      'preFreeze': instanceLifecycleConfig?.preFreeze || emptyProp,
+      'preStop': instanceLifecycleConfig?.preStop || emptyProp,
     }
 
     if (runtime === 'custom-container') {
@@ -184,7 +215,7 @@ export default class Component {
 
     let res;
     try {
-      res = await Client.fcClient.updateFunction(serviceName, functionName, functionConfig);
+      res = await fcClient.updateFunction(serviceName, functionName, functionConfig);
     } catch (ex) {
       if (ex.code !== 'FunctionNotFound') {
         this.logger.debug(`ex code: ${ex.code}, ex: ${ex.message}`);
@@ -193,25 +224,30 @@ export default class Component {
       }
       functionConfig.functionName = functionName;
       try {
-        res = await Client.fcClient.createFunction(serviceName, functionConfig);
+        res = await fcClient.createFunction(serviceName, functionConfig);
       } catch (e) {
         vm.fail();
         throw e;
       }
     }
+    await makeDestination({
+      serviceName,
+      functionName,
+      asyncConfiguration,
+    });
     vm.succeed(`Make function ${serviceName}/${functionName} success.`);
 
     return res;
   }
 
-  static async makeTrigger(serviceName, functionName, triggerConfig) {
+  static async makeTrigger(fcClient, serviceName, functionName, triggerConfig) {
     const { triggerName } = triggerConfig;
 
     const vm = spinner(`Make trigger ${serviceName}/${functionName}/${triggerName}...`);
 
     let res;
     try {
-      res = await Client.fcClient.createTrigger(serviceName, functionName, triggerConfig);
+      res = await fcClient.createTrigger(serviceName, functionName, triggerConfig);
     } catch (ex) {
       if (ex.code !== 'TriggerAlreadyExists') {
         this.logger.debug(`ex code: ${ex.code}, ex: ${ex.message}`);
@@ -219,7 +255,7 @@ export default class Component {
         throw ex;
       }
       try {
-        res = await Client.fcClient.updateTrigger(serviceName, functionName, triggerName, triggerConfig);
+        res = await fcClient.updateTrigger(serviceName, functionName, triggerName, triggerConfig);
       } catch (e) {
         if (e.message.includes('Updating trigger is not supported yet.')) {
           vm.warn(`Updating ${serviceName}/${functionName}/${triggerName} is not supported yet.`);

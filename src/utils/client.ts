@@ -1,27 +1,47 @@
 import FC from '@alicloud/fc2';
+import Pop from '@alicloud/pop-core';
 import { ICredentials } from '../interface/inputs';
 
 export default class Client {
-  static fcClient: any;
+  static region: string;
+  static credentials: ICredentials;
 
-  static setFcClient(region: string, credentials: ICredentials) {
+  static fcClient() {
     const {
       AccountID,
       AccessKeyID,
       AccessKeySecret,
       SecurityToken,
-    } = credentials;
+    } = this.credentials;
 
-    const fcClient = new FC(AccountID, {
+    return new FC(AccountID, {
       accessKeyID: AccessKeyID,
       accessKeySecret: AccessKeySecret,
       securityToken: SecurityToken,
-      region,
+      region: this.region,
       timeout: 6000000,
     });
+  }
 
-    this.fcClient = fcClient;
+  static xtraceClient() {
+    const {
+      AccessKeyID,
+      AccessKeySecret,
+      SecurityToken,
+    } = this.credentials;
+    const endpoint = `https://xtrace.${this.region}.aliyuncs.com`;
+    const apiVersion = '2019-08-08';
 
-    return fcClient;
+    return new Pop({
+      endpoint: endpoint,
+      apiVersion: apiVersion,
+      accessKeyId: AccessKeyID,
+      accessKeySecret: AccessKeySecret,
+      // @ts-ignore
+      securityToken: SecurityToken,
+      opts: {
+        timeout: 6000000
+      }
+    });
   }
 }

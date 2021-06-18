@@ -1,0 +1,36 @@
+edition: 1.0.0          #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: fcDeployApp       #  项目名称
+access: default  #  秘钥别名
+
+services:
+  fc-base-test:
+    component: ${path(../..)}
+    props:
+      region: cn-shenzhen
+      service:
+        name: fc-base-component-service
+        # tracingConfig: Enable
+        role: acs:ram::*****:role/new-service-role
+      function:
+        name: fc-base-component-function-two
+        service: qianfeng-fc-base-component-service
+        filename: ./code.zip
+        handler: index.handler
+        memorySize: 128
+        runtime: nodejs12
+        timeout: 60
+        instanceLifecycleConfig:
+          preFreeze:
+            handler: index.aaa
+            timeout: 60
+          preStop:
+            handler: index.preStop
+            preStop: 60
+        asyncConfiguration:
+          destination:
+            onSuccess: acs:fc:::services/ServerlessTool.LATEST/functions/serverless_demo_nodejs8_http
+            onFailure: acs:fc:::services/Puppeteer.LATEST/functions/HtmlToPng
+          maxAsyncEventAgeInSeconds: 567
+          maxAsyncRetryAttempts: 3
+          statefulInvocation: true
+

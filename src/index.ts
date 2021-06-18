@@ -9,8 +9,6 @@ export default class Component {
   @HLogger('FC-BASE-SDK') logger: ILogger;
 
   async initInputs(inputs: IInputProps, command: string) {
-    this.logger.debug(inputs.props);
-
     const { region } = inputs.props;
     if (!inputs.credentials) {
       inputs.credentials = await getCredential(inputs.project.access);
@@ -21,7 +19,8 @@ export default class Component {
       uid: inputs.credentials.AccountID,
     });
 
-    Client.setFcClient(region, inputs.credentials);
+    Client.credentials = inputs.credentials;
+    Client.region = region;
 
     this.logger.debug(JSON.stringify(_.pick(inputs, ['props', 'appName', 'project', 'args']), null, '  '));
     return inputs;
