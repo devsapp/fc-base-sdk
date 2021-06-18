@@ -19,12 +19,33 @@ export interface IFunctionConfig {
   ossBucket?: string;
   ossKey?: string;
   code?: ICodeZipFile | ICodeOss;
+  asyncConfiguration?: {
+    statefulInvocation?: boolean;
+    maxAsyncRetryAttempts?: number;
+    maxAsyncEventAgeInSeconds?: number;
+    destination?: {
+      onSuccess?: string;
+      onFailure?: string;
+    };
+  };
+  instanceLifecycleConfig?: {
+    preFreeze?: {
+      handler?: string;
+      timeout?: string;
+    };
+    preStop?: {
+      handler?: string;
+      timeout?: string;
+    }
+  };
 }
 
 export interface ICustomContainerConfig {
   image: string;
   command?: string;
   args?: string;
+  instanceID?: string;
+  accelerationType?: 'Default' | 'None';
 }
 export function isCustomContainerConfig(args: any): args is ICustomContainerConfig {
   return args && 'image' in args;

@@ -6,12 +6,14 @@ export interface IServiceConfig {
   role?: string;
   vpcConfig?: IVpcConfig;
   nasConfig?: INasConfig;
+  tracingConfig?: string;
 }
 
 export interface ILogConfig {
   project: string;
   logstore: string;
   enableRequestMetrics?: boolean;
+  enableInstanceMetrics?: boolean;
 }
 
 export interface IVpcConfig {
