@@ -8,7 +8,7 @@ export async function makeDestination({
   qualifier = 'LATEST',
 }) {
   const accountId = Client.credentials.AccountID;
-  const region = Client.region;
+  const { region } = Client;
   const fcClient = Client.fcClient();
 
   const destination = asyncConfiguration?.destination || {};

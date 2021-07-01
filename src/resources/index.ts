@@ -135,8 +135,8 @@ export default class Component {
         serviceConfig.tracingConfig = {
           type: 'Jaeger',
           params: {
-            endpoint: `${token.InternalDomain}/adapt_${token.LicenseKey}_${token.Pid}/api/traces`
-          }
+            endpoint: `${token.InternalDomain}/adapt_${token.LicenseKey}_${token.Pid}/api/traces`,
+          },
         };
       } catch (e) {
         throw new Error(e.message);
@@ -194,12 +194,12 @@ export default class Component {
     }
 
     const emptyProp = {
-      'handler': ''
+      handler: '',
     };
     functionConfig.instanceLifecycleConfig = {
-      'preFreeze': instanceLifecycleConfig?.preFreeze || emptyProp,
-      'preStop': instanceLifecycleConfig?.preStop || emptyProp,
-    }
+      preFreeze: instanceLifecycleConfig?.preFreeze || emptyProp,
+      preStop: instanceLifecycleConfig?.preStop || emptyProp,
+    };
 
     if (runtime === 'custom-container') {
       if (!isCustomContainerConfig(customContainerConfig)) {
@@ -210,7 +210,7 @@ export default class Component {
     }
 
     if (functionConfig.environmentVariables) {
-      functionConfig.environmentVariables = _.mapValues(functionConfig.environmentVariables, value => value.toString());
+      functionConfig.environmentVariables = _.mapValues(functionConfig.environmentVariables, (value) => value.toString());
     }
 
     let res;

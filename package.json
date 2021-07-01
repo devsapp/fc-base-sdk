@@ -1,6 +1,6 @@
 {
   "name": "fc-base-sdk",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "./dist/index.js",
   "dependencies": {
     "@alicloud/fc2": "^2.2.2",
@@ -26,7 +26,7 @@
     "start": "npm run watch",
     "watch": "npx tsc -w -p tsconfig.json",
     "prebuild": "rimraf dist",
-    "build": "npx tsc -p tsconfig.json",
+    "build": "npm run fix && npx tsc -p tsconfig.json",
     "test": "jest",
     "test:cov": "jest --coverage",
     "lint": "f2elint scan",

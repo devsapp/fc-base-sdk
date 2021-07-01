@@ -36,7 +36,7 @@ export interface IFunctionConfig {
     preStop?: {
       handler?: string;
       timeout?: string;
-    }
+    };
   };
 }
 

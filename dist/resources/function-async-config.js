@@ -45,36 +45,39 @@ var client_1 = __importDefault(require("../utils/client"));
 function makeDestination(_a) {
     var serviceName = _a.serviceName, functionName = _a.functionName, asyncConfiguration = _a.asyncConfiguration, _b = _a.qualifier, qualifier = _b === void 0 ? 'LATEST' : _b;
     return __awaiter(this, void 0, void 0, function () {
-        var accountId, region, fcClient, _c, onSuccess, onFailure, hasAsyncConfig, data, asyncConfigCache, ex_1, ex_2, ex_3;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var accountId, region, fcClient, destination, onSuccess, onFailure, hasAsyncConfig, data, asyncConfigCache, ex_1;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
-                    accountId = client_1.default.credentials.AccessKeyID;
+                    accountId = client_1.default.credentials.AccountID;
                     region = client_1.default.region;
                     fcClient = client_1.default.fcClient();
-                    _c = (asyncConfiguration === null || asyncConfiguration === void 0 ? void 0 : asyncConfiguration.destination) || {}, onSuccess = _c.onSuccess, onFailure = _c.onFailure;
+                    destination = (asyncConfiguration === null || asyncConfiguration === void 0 ? void 0 : asyncConfiguration.destination) || {};
+                    delete asyncConfiguration.destination;
+                    asyncConfiguration.destinationConfig = destination;
+                    onSuccess = destination.onSuccess, onFailure = destination.onFailure;
                     if (onSuccess) {
-                        asyncConfiguration.destination.onSuccess = {
-                            destination: onSuccess.replace(':::', ":" + region + ":" + accountId + ":")
+                        asyncConfiguration.destinationConfig.onSuccess = {
+                            destination: onSuccess.replace(':::', ":" + region + ":" + accountId + ":"),
                         };
                     }
                     if (onFailure) {
-                        asyncConfiguration.destination.onFailure = {
-                            destination: onFailure.replace(':::', ":" + region + ":" + accountId + ":")
+                        asyncConfiguration.destinationConfig.onFailure = {
+                            destination: onFailure.replace(':::', ":" + region + ":" + accountId + ":"),
                         };
                     }
                     hasAsyncConfig = false;
-                    _d.label = 1;
+                    _c.label = 1;
                 case 1:
-                    _d.trys.push([1, 3, , 4]);
+                    _c.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, fcClient.getFunctionAsyncConfig(serviceName, functionName, qualifier)];
                 case 2:
-                    data = (_d.sent()).data;
+                    data = (_c.sent()).data;
                     asyncConfigCache = {
                         destinationConfig: data.destinationConfig,
                         maxAsyncEventAgeInSeconds: data.maxAsyncEventAgeInSeconds,
                         statefulInvocation: data.statefulInvocation,
-                        maxAsyncRetryAttempts: data.maxAsyncRetryAttempts
+                        maxAsyncRetryAttempts: data.maxAsyncRetryAttempts,
                     };
                     if (lodash_1.default.isEqual(asyncConfiguration, asyncConfigCache)) {
                         return [2 /*return*/];
@@ -82,39 +85,27 @@ function makeDestination(_a) {
                     hasAsyncConfig = true;
                     return [3 /*break*/, 4];
                 case 3:
-                    ex_1 = _d.sent();
+                    ex_1 = _c.sent();
                     if (ex_1.code !== 'AsyncConfigNotExists') {
                         throw ex_1;
                     }
                     return [3 /*break*/, 4];
                 case 4:
-                    if (!hasAsyncConfig) return [3 /*break*/, 8];
-                    _d.label = 5;
-                case 5:
-                    _d.trys.push([5, 7, , 8]);
+                    if (!hasAsyncConfig) return [3 /*break*/, 6];
                     return [4 /*yield*/, fcClient.deleteFunctionAsyncConfig(serviceName, functionName, qualifier)];
+                case 5:
+                    _c.sent();
+                    _c.label = 6;
                 case 6:
-                    _d.sent();
-                    return [3 /*break*/, 8];
-                case 7:
-                    ex_2 = _d.sent();
-                    throw ex_2;
-                case 8:
-                    if (!asyncConfiguration) return [3 /*break*/, 12];
-                    _d.label = 9;
-                case 9:
-                    _d.trys.push([9, 11, , 12]);
+                    if (!asyncConfiguration) return [3 /*break*/, 8];
                     return [4 /*yield*/, fcClient.putFunctionAsyncConfig(serviceName, functionName, qualifier, asyncConfiguration)];
-                case 10:
-                    _d.sent();
-                    return [3 /*break*/, 12];
-                case 11:
-                    ex_3 = _d.sent();
-                    throw ex_3;
-                case 12: return [2 /*return*/];
+                case 7:
+                    _c.sent();
+                    _c.label = 8;
+                case 8: return [2 /*return*/];
             }
         });
     });
 }
 exports.makeDestination = makeDestination;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZnVuY3Rpb24tYXN5bmMtY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3Jlc291cmNlcy9mdW5jdGlvbi1hc3luYy1jb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQXVCO0FBQ3ZCLDJEQUFxQztBQUVyQyxTQUFzQixlQUFlLENBQUMsRUFLckM7UUFKQyxXQUFXLGlCQUFBLEVBQ1gsWUFBWSxrQkFBQSxFQUNaLGtCQUFrQix3QkFBQSxFQUNsQixpQkFBb0IsRUFBcEIsU0FBUyxtQkFBRyxRQUFRLEtBQUE7Ozs7OztvQkFFZCxTQUFTLEdBQUcsZ0JBQU0sQ0FBQyxXQUFXLENBQUMsV0FBVyxDQUFDO29CQUMzQyxNQUFNLEdBQUcsZ0JBQU0sQ0FBQyxNQUFNLENBQUM7b0JBQ3ZCLFFBQVEsR0FBRyxnQkFBTSxDQUFDLFFBQVEsRUFBRSxDQUFDO29CQUM3QixLQUEyQixDQUFBLGtCQUFrQixhQUFsQixrQkFBa0IsdUJBQWxCLGtCQUFrQixDQUFFLFdBQVcsS0FBSSxFQUFFLEVBQTlELFNBQVMsZUFBQSxFQUFFLFNBQVMsZUFBQSxDQUEyQztvQkFFdkUsSUFBSSxTQUFTLEVBQUU7d0JBQ2Isa0JBQWtCLENBQUMsV0FBVyxDQUFDLFNBQVMsR0FBRzs0QkFDekMsV0FBVyxFQUFFLFNBQVMsQ0FBQyxPQUFPLENBQUMsS0FBSyxFQUFFLE1BQUksTUFBTSxTQUFJLFNBQVMsTUFBRyxDQUFDO3lCQUNsRSxDQUFDO3FCQUNIO29CQUNELElBQUksU0FBUyxFQUFFO3dCQUNiLGtCQUFrQixDQUFDLFdBQVcsQ0FBQyxTQUFTLEdBQUc7NEJBQ3pDLFdBQVcsRUFBRSxTQUFTLENBQUMsT0FBTyxDQUFDLEtBQUssRUFBRSxNQUFJLE1BQU0sU0FBSSxTQUFTLE1BQUcsQ0FBQzt5QkFDbEUsQ0FBQztxQkFDSDtvQkFFRyxjQUFjLEdBQUcsS0FBSyxDQUFDOzs7O29CQUVSLHFCQUFNLFFBQVEsQ0FBQyxzQkFBc0IsQ0FBQyxXQUFXLEVBQUUsWUFBWSxFQUFFLFNBQVMsQ0FBQyxFQUFBOztvQkFBcEYsSUFBSSxHQUFLLENBQUEsU0FBMkUsQ0FBQSxLQUFoRjtvQkFDTixnQkFBZ0IsR0FBRzt3QkFDdkIsaUJBQWlCLEVBQUUsSUFBSSxDQUFDLGlCQUFpQjt3QkFDekMseUJBQXlCLEVBQUUsSUFBSSxDQUFDLHlCQUF5Qjt3QkFDekQsa0JBQWtCLEVBQUUsSUFBSSxDQUFDLGtCQUFrQjt3QkFDM0MscUJBQXFCLEVBQUUsSUFBSSxDQUFDLHFCQUFxQjtxQkFDbEQsQ0FBQztvQkFDRixJQUFJLGdCQUFDLENBQUMsT0FBTyxDQUFDLGtCQUFrQixFQUFFLGdCQUFnQixDQUFDLEVBQUU7d0JBQ25ELHNCQUFPO3FCQUNSO29CQUNELGNBQWMsR0FBRyxJQUFJLENBQUM7Ozs7b0JBRXRCLElBQUksSUFBRSxDQUFDLElBQUksS0FBSyxzQkFBc0IsRUFBRTt3QkFDdEMsTUFBTSxJQUFFLENBQUM7cUJBQ1Y7Ozt5QkFHQyxjQUFjLEVBQWQsd0JBQWM7Ozs7b0JBRWQscUJBQU0sUUFBUSxDQUFDLHlCQUF5QixDQUFDLFdBQVcsRUFBRSxZQUFZLEVBQUUsU0FBUyxDQUFDLEVBQUE7O29CQUE5RSxTQUE4RSxDQUFDOzs7O29CQUUvRSxNQUFNLElBQUUsQ0FBQzs7eUJBSVQsa0JBQWtCLEVBQWxCLHlCQUFrQjs7OztvQkFFbEIscUJBQU0sUUFBUSxDQUFDLHNCQUFzQixDQUFDLFdBQVcsRUFBRSxZQUFZLEVBQUUsU0FBUyxFQUFFLGtCQUFrQixDQUFDLEVBQUE7O29CQUEvRixTQUErRixDQUFDOzs7O29CQUVoRyxNQUFNLElBQUUsQ0FBQzs7Ozs7Q0FHZDtBQXhERCwwQ0F3REMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZnVuY3Rpb24tYXN5bmMtY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3Jlc291cmNlcy9mdW5jdGlvbi1hc3luYy1jb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsa0RBQXVCO0FBQ3ZCLDJEQUFxQztBQUVyQyxTQUFzQixlQUFlLENBQUMsRUFLckM7UUFKQyxXQUFXLGlCQUFBLEVBQ1gsWUFBWSxrQkFBQSxFQUNaLGtCQUFrQix3QkFBQSxFQUNsQixpQkFBb0IsRUFBcEIsU0FBUyxtQkFBRyxRQUFRLEtBQUE7Ozs7OztvQkFFZCxTQUFTLEdBQUcsZ0JBQU0sQ0FBQyxXQUFXLENBQUMsU0FBUyxDQUFDO29CQUN2QyxNQUFNLEdBQUssZ0JBQU0sT0FBWCxDQUFZO29CQUNwQixRQUFRLEdBQUcsZ0JBQU0sQ0FBQyxRQUFRLEVBQUUsQ0FBQztvQkFFN0IsV0FBVyxHQUFHLENBQUEsa0JBQWtCLGFBQWxCLGtCQUFrQix1QkFBbEIsa0JBQWtCLENBQUUsV0FBVyxLQUFJLEVBQUUsQ0FBQztvQkFDMUQsT0FBTyxrQkFBa0IsQ0FBQyxXQUFXLENBQUM7b0JBRXRDLGtCQUFrQixDQUFDLGlCQUFpQixHQUFHLFdBQVcsQ0FBQztvQkFDM0MsU0FBUyxHQUFnQixXQUFXLFVBQTNCLEVBQUUsU0FBUyxHQUFLLFdBQVcsVUFBaEIsQ0FBaUI7b0JBQzdDLElBQUksU0FBUyxFQUFFO3dCQUNiLGtCQUFrQixDQUFDLGlCQUFpQixDQUFDLFNBQVMsR0FBRzs0QkFDL0MsV0FBVyxFQUFFLFNBQVMsQ0FBQyxPQUFPLENBQUMsS0FBSyxFQUFFLE1BQUksTUFBTSxTQUFJLFNBQVMsTUFBRyxDQUFDO3lCQUNsRSxDQUFDO3FCQUNIO29CQUNELElBQUksU0FBUyxFQUFFO3dCQUNiLGtCQUFrQixDQUFDLGlCQUFpQixDQUFDLFNBQVMsR0FBRzs0QkFDL0MsV0FBVyxFQUFFLFNBQVMsQ0FBQyxPQUFPLENBQUMsS0FBSyxFQUFFLE1BQUksTUFBTSxTQUFJLFNBQVMsTUFBRyxDQUFDO3lCQUNsRSxDQUFDO3FCQUNIO29CQUVHLGNBQWMsR0FBRyxLQUFLLENBQUM7Ozs7b0JBRVIscUJBQU0sUUFBUSxDQUFDLHNCQUFzQixDQUFDLFdBQVcsRUFBRSxZQUFZLEVBQUUsU0FBUyxDQUFDLEVBQUE7O29CQUFwRixJQUFJLEdBQUssQ0FBQSxTQUEyRSxDQUFBLEtBQWhGO29CQUNOLGdCQUFnQixHQUFHO3dCQUN2QixpQkFBaUIsRUFBRSxJQUFJLENBQUMsaUJBQWlCO3dCQUN6Qyx5QkFBeUIsRUFBRSxJQUFJLENBQUMseUJBQXlCO3dCQUN6RCxrQkFBa0IsRUFBRSxJQUFJLENBQUMsa0JBQWtCO3dCQUMzQyxxQkFBcUIsRUFBRSxJQUFJLENBQUMscUJBQXFCO3FCQUNsRCxDQUFDO29CQUNGLElBQUksZ0JBQUMsQ0FBQyxPQUFPLENBQUMsa0JBQWtCLEVBQUUsZ0JBQWdCLENBQUMsRUFBRTt3QkFDbkQsc0JBQU87cUJBQ1I7b0JBQ0QsY0FBYyxHQUFHLElBQUksQ0FBQzs7OztvQkFFdEIsSUFBSSxJQUFFLENBQUMsSUFBSSxLQUFLLHNCQUFzQixFQUFFO3dCQUN0QyxNQUFNLElBQUUsQ0FBQztxQkFDVjs7O3lCQUdDLGNBQWMsRUFBZCx3QkFBYztvQkFDaEIscUJBQU0sUUFBUSxDQUFDLHlCQUF5QixDQUFDLFdBQVcsRUFBRSxZQUFZLEVBQUUsU0FBUyxDQUFDLEVBQUE7O29CQUE5RSxTQUE4RSxDQUFDOzs7eUJBRzdFLGtCQUFrQixFQUFsQix3QkFBa0I7b0JBQ3BCLHFCQUFNLFFBQVEsQ0FBQyxzQkFBc0IsQ0FBQyxXQUFXLEVBQUUsWUFBWSxFQUFFLFNBQVMsRUFBRSxrQkFBa0IsQ0FBQyxFQUFBOztvQkFBL0YsU0FBK0YsQ0FBQzs7Ozs7O0NBRW5HO0FBcERELDBDQW9EQyJ9

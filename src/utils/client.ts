@@ -33,15 +33,15 @@ export default class Client {
     const apiVersion = '2019-08-08';
 
     return new Pop({
-      endpoint: endpoint,
-      apiVersion: apiVersion,
+      endpoint,
+      apiVersion,
       accessKeyId: AccessKeyID,
       accessKeySecret: AccessKeySecret,
       // @ts-ignore
       securityToken: SecurityToken,
       opts: {
-        timeout: 6000000
-      }
+        timeout: 6000000,
+      },
     });
   }
 }
