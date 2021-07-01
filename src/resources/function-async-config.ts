@@ -7,19 +7,23 @@ export async function makeDestination({
   asyncConfiguration,
   qualifier = 'LATEST',
 }) {
-  const accountId = Client.credentials.AccessKeyID;
+  const accountId = Client.credentials.AccountID;
   const region = Client.region;
   const fcClient = Client.fcClient();
-  const { onSuccess, onFailure } = asyncConfiguration?.destination || {};
 
+  const destination = asyncConfiguration?.destination || {};
+  delete asyncConfiguration.destination;
+
+  asyncConfiguration.destinationConfig = destination;
+  const { onSuccess, onFailure } = destination;
   if (onSuccess) {
-    asyncConfiguration.destination.onSuccess = {
-      destination: onSuccess.replace(':::', `:${region}:${accountId}:`)
+    asyncConfiguration.destinationConfig.onSuccess = {
+      destination: onSuccess.replace(':::', `:${region}:${accountId}:`),
     };
   }
   if (onFailure) {
-    asyncConfiguration.destination.onFailure = {
-      destination: onFailure.replace(':::', `:${region}:${accountId}:`)
+    asyncConfiguration.destinationConfig.onFailure = {
+      destination: onFailure.replace(':::', `:${region}:${accountId}:`),
     };
   }
 
@@ -30,7 +34,7 @@ export async function makeDestination({
       destinationConfig: data.destinationConfig,
       maxAsyncEventAgeInSeconds: data.maxAsyncEventAgeInSeconds,
       statefulInvocation: data.statefulInvocation,
-      maxAsyncRetryAttempts: data.maxAsyncRetryAttempts
+      maxAsyncRetryAttempts: data.maxAsyncRetryAttempts,
     };
     if (_.isEqual(asyncConfiguration, asyncConfigCache)) {
       return;
@@ -43,18 +47,10 @@ export async function makeDestination({
   }
 
   if (hasAsyncConfig) {
-    try {
-      await fcClient.deleteFunctionAsyncConfig(serviceName, functionName, qualifier);
-    } catch (ex) {
-      throw ex;
-    }
+    await fcClient.deleteFunctionAsyncConfig(serviceName, functionName, qualifier);
   }
 
   if (asyncConfiguration) {
-    try {
-      await fcClient.putFunctionAsyncConfig(serviceName, functionName, qualifier, asyncConfiguration);
-    } catch (ex) {
-      throw ex;
-    }
+    await fcClient.putFunctionAsyncConfig(serviceName, functionName, qualifier, asyncConfiguration);
   }
 }
