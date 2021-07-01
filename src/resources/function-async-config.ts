@@ -7,12 +7,13 @@ export async function makeDestination({
   asyncConfiguration,
   qualifier = 'LATEST',
 }) {
+  if (_.isEmpty(asyncConfiguration)) { return; }
   const accountId = Client.credentials.AccountID;
   const { region } = Client;
   const fcClient = Client.fcClient();
 
   const destination = asyncConfiguration?.destination || {};
-  delete asyncConfiguration.destination;
+  delete asyncConfiguration?.destination;
 
   asyncConfiguration.destinationConfig = destination;
   const { onSuccess, onFailure } = destination;
