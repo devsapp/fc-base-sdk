@@ -7,25 +7,27 @@ export async function makeDestination({
   asyncConfiguration,
   qualifier = 'LATEST',
 }) {
-  if (_.isEmpty(asyncConfiguration)) { return; }
   const accountId = Client.credentials.AccountID;
   const { region } = Client;
   const fcClient = Client.fcClient();
 
-  const destination = asyncConfiguration?.destination || {};
-  delete asyncConfiguration?.destination;
+  if (!_.isEmpty(asyncConfiguration)) {
+    const destination = asyncConfiguration.destination || {};
+    const { onSuccess, onFailure } = destination;
+    delete asyncConfiguration.destination;
 
-  asyncConfiguration.destinationConfig = destination;
-  const { onSuccess, onFailure } = destination;
-  if (onSuccess) {
-    asyncConfiguration.destinationConfig.onSuccess = {
-      destination: onSuccess.replace(':::', `:${region}:${accountId}:`),
-    };
-  }
-  if (onFailure) {
-    asyncConfiguration.destinationConfig.onFailure = {
-      destination: onFailure.replace(':::', `:${region}:${accountId}:`),
-    };
+    const destinationConfig: any = {};
+    if (onSuccess) {
+      destinationConfig.onSuccess = {
+        destination: onSuccess.replace(':::', `:${region}:${accountId}:`),
+      };
+    }
+    if (onFailure) {
+      destinationConfig.onFailure = {
+        destination: onFailure.replace(':::', `:${region}:${accountId}:`),
+      };
+    }
+    asyncConfiguration.destinationConfig = destinationConfig;
   }
 
   let hasAsyncConfig = false;
