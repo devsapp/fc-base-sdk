@@ -1,6 +1,6 @@
 {
   "name": "fc-base-sdk",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "./dist/index.js",
   "dependencies": {
     "@alicloud/fc2": "^2.2.2",
