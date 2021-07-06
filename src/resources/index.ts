@@ -1,3 +1,4 @@
+/* eslint-disable require-atomic-updates */
 import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
 import _ from 'lodash';
@@ -230,12 +231,27 @@ export default class Component {
         throw e;
       }
     }
-    await makeDestination({
-      serviceName,
-      functionName,
-      asyncConfiguration,
-    });
+
+    let asyncWarn = '';
+    try {
+      await makeDestination({
+        serviceName,
+        functionName,
+        asyncConfiguration,
+      });
+    } catch (e) {
+      if (_.isEmpty(asyncConfiguration) && e.message.includes('failed with 403')) {
+        asyncWarn = e.message;
+      } else {
+        vm.fail();
+        throw e;
+      }
+    }
     vm.succeed(`Make function ${serviceName}/${functionName} success.`);
+
+    if (asyncWarn) {
+      this.logger.warn(`Reminder function.asyncConfig: ${asyncWarn}`);
+    }
 
     return res;
   }
