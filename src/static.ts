@@ -9,9 +9,8 @@ export const REMOVE_HELP_INFO = [
     header: 'Options',
     optionList: [
       {
-        name: 'name',
+        name: 'trigger-name',
         description: 'Resource name to be removed, only for trigger/domain resource.',
-        alias: '-n',
         type: String,
       },
       {
