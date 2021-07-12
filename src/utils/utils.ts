@@ -1,3 +1,44 @@
+import inquirer from 'inquirer';
+import _ from 'lodash';
+import Table from 'tty-table';
+
+
+export const tableShow = (data, showKey) => {
+  const options = {
+    borderStyle: 'solid',
+    borderColor: 'blue',
+    headerAlign: 'center',
+    align: 'left',
+    color: 'cyan',
+    width: '100%',
+  };
+  const header_option = {
+    headerColor: 'cyan',
+    color: 'cyan',
+    align: 'left',
+    width: 'auto',
+    formatter: (value) => value,
+  };
+
+  const header = showKey.map((value) => (!_.isString() ? ({
+    ...header_option,
+    value,
+  }) : ({ ...header_option, ...value })));
+
+  console.log(Table(header, data, options).render());
+};
+
+export async function promptForConfirmOrDetails(message: string): Promise<boolean> {
+  const answers: any = await inquirer.prompt([{
+    type: 'list',
+    name: 'prompt',
+    message,
+    choices: ['yes', 'no'],
+  }]);
+
+  return answers.prompt === 'yes';
+}
+
 export const sleep = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function transfromTriggerConfig(triggerConfig, region, accountId) {

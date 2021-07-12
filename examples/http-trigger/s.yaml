@@ -1,18 +1,17 @@
-edition: 1.0.0          #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
-name: fcBaseApp         #  项目名称
-access: default  #  秘钥别名
+edition: 1.0.0 
+name: fcBaseApp   
+access: default
 
 services:
-  fc-base-test: #  服务名称
-    # component: fc-base  # 组件名称
-    component: /Users/wb447188/Desktop/sdk
-    props: #  组件的属性值
+  fc-base-test:
+    component: ${path(../..)}
+    props:
       region: cn-shenzhen
       service:
-        name: qianfeng-fc-base-service
+        name: fc-base-service
       function:
         name: test-function
-        service: qianfeng-fc-base-service
+        service: fc-base-service
         filename: './code.zip'
         handler: 'index.handler'
         memorySize: 128
@@ -21,22 +20,21 @@ services:
       triggers:
         - name: httpTrigger
           function: test-function
-          service: qianfeng-fc-base-service
+          service: fc-base-service
           type: http
           config:
             authType: anonymous
             methods:
               - GET
-  fc-base-test-1: #  服务名称
-    # component: fc-base  # 组件名称
-    component: /Users/zqf/Documents/git_proj/serverless-devs-component/fc-base-alibaba-component/
-    props: #  组件的属性值
-      region: cn-hangzhou
+  fc-base-test-1:
+    component: ${path(../..)}
+    props:
+      region: cn-shenzhen
       service:
-        name: qianfeng-fc-base-service
+        name: fc-base-service
       function:
         name: test-function-1
-        service: qianfeng-fc-base-service
+        service: fc-base-service
         filename: './code.zip'
         handler: 'index.handler'
         memorySize: 128
@@ -45,7 +43,7 @@ services:
       triggers:
         - name: httpTrigger
           function: test-function-1
-          service: qianfeng-fc-base-service
+          service: fc-base-service
           type: http
           config:
             authType: anonymous

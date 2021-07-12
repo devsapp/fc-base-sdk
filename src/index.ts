@@ -1,14 +1,15 @@
 import { ILogger, HLogger, commandParse, help, getCredential, reportComponent } from '@serverless-devs/core';
-import { IInputProps } from './interface/inputs';
+import { InputProps } from './common/entity';
 import Client from './utils/client';
 import _ from 'lodash';
-import Resources from './resources';
+import Deploy from './command/deploy';
+import Remove from './command/remove';
 import { REMOVE_HELP_INFO } from './static';
 
 export default class Component {
   @HLogger('FC-BASE-SDK') logger: ILogger;
 
-  async initInputs(inputs: IInputProps, command: string) {
+  async initInputs(inputs: InputProps, command: string) {
     const { region } = inputs.props;
     if (!inputs.credentials) {
       inputs.credentials = await getCredential(inputs.project.access);
@@ -26,41 +27,44 @@ export default class Component {
     return inputs;
   }
 
-  async deploy(inputs: IInputProps) {
+  async deploy(inputs: InputProps) {
     const newInputs = await this.initInputs(_.cloneDeep(inputs), 'deploy');
 
-    return await Resources.deploy(newInputs.props);
+    return await Deploy.deploy(newInputs.props);
   }
 
-  async remove(inputs: IInputProps) {
-    const { args, props } = await this.initInputs(_.cloneDeep(inputs), 'remove');
+  async remove(inputs: InputProps) {
+    const { args = '', props } = await this.initInputs(_.cloneDeep(inputs), 'remove');
 
+    /**
+     * 如果指定了 only-local，那么不和远端交互，仅删除传入配置【权重大于 y/assume-yes】
+     * 如果指定了 y/assume-yes，那么就强制删除线上所有配置，为防止没有权限查询线上所有，并尝试删除传入的配置
+     * 如果没有指定 only-local、y/assume-yes，那么拿远端资源和传入配置做对比，如果远端存在传入配置没有的资源，则提示是否删除额外的所有此项子资源
+     *  - 如果选择 yes，行为类同 y/assume-yes
+     *  - 如果选择 no，行为类同 only-local
+     */
     const apts = {
-      boolean: ['help', 'assumeYes'],
-      string: ['name'],
-      alias: { help: 'h', assumeYes: 'y', name: 'n' },
+      boolean: ['help', 'y', 'only-local'],
+      string: ['trigger-name'],
+      alias: { help: 'h', triggerName: 'trigger-name', 'assume-yes': 'y' },
     };
     const parsedArgs: {[key: string]: any} = commandParse({ args }, apts);
-    const nonOptionsArgs = parsedArgs.data?._;
-    const { name } = parsedArgs.data || {};
+    const nonOptionsArgs = parsedArgs.data?._ || [];
+    const { y: force, triggerName, 'only-local': silent } = parsedArgs.data || {};
 
-    if (_.isEmpty(nonOptionsArgs)) {
-      this.logger.error(' error: expects argument.');
-      help(REMOVE_HELP_INFO);
-      return;
-    }
     if (nonOptionsArgs.length > 1) {
-      this.logger.error(` error: unexpected argument: ${nonOptionsArgs[1]}`);
-      help(REMOVE_HELP_INFO);
-      return;
-    }
-    const nonOptionsArg = nonOptionsArgs[0];
-    if (!['service', 'function', 'trigger'].includes(nonOptionsArg)) {
-      this.logger.error(` remove ${nonOptionsArg} is not supported now.`);
-      help(REMOVE_HELP_INFO);
-      return;
+      this.logger.error(' error: expects argument.');
+      return help(REMOVE_HELP_INFO);
     }
 
-    return await Resources.remove(props, { nonOptionsArg, name });
+    const command = nonOptionsArgs[0] || 'service';
+    const supportCommand = ['service', 'function', 'trigger'];
+    if (!supportCommand.includes(command)) {
+      this.logger.error(` remove ${command} is not supported now.`);
+      return help(REMOVE_HELP_INFO);
+    }
+    const remove = new Remove(props.region);
+    await remove[command](props, { force, triggerName, silent });
+    return remove.removeNameList;
   }
 }

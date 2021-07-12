@@ -1,6 +1,6 @@
 import FC from '@alicloud/fc2';
 import Pop from '@alicloud/pop-core';
-import { ICredentials } from '../interface/inputs';
+import { ICredentials } from '../common/entity';
 
 export default class Client {
   static region: string;

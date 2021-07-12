@@ -5,80 +5,12 @@ import _ from 'lodash';
 // import path from 'path';
 import Client from '../utils/client';
 import { transfromTriggerConfig } from '../utils/utils';
-import { IProperties } from '../interface/inputs';
+import { IProperties } from '../common/entity';
 import { isCode, isCustomContainerConfig } from '../interface/function';
 import { makeDestination } from './function-async-config';
 
-const errorCode = ['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'];
-
 export default class Component {
   @HLogger('FC-BASE-SDK') static logger: ILogger;
-
-  static async remove(props: IProperties, { nonOptionsArg, name }) {
-    const { service, function: functionConfig, triggers } = props;
-    const serviceName = service.name;
-    const functionName = functionConfig?.name;
-    const fcClient = Client.fcClient();
-
-    const deleteService = nonOptionsArg === 'service';
-    const deleteFunction = nonOptionsArg === 'function' || deleteService;
-
-    if (triggers) {
-      let isContinue = false;
-      const onlyDeleteOneTrigger = name && nonOptionsArg === 'trigger';
-      for (const { name: triggerName } of triggers) {
-        if (onlyDeleteOneTrigger) {
-          if (triggerName !== name) {
-            continue;
-          }
-          isContinue = true;
-        }
-        const vm = spinner(`Delete trigger ${serviceName}/${functionName}/${triggerName}...`);
-        try {
-          await fcClient.deleteTrigger(serviceName, functionName, triggerName);
-          vm.succeed(`Delete trigger ${serviceName}/${functionName}/${triggerName} success.`);
-        } catch (ex) {
-          if (errorCode.includes(ex.code)) {
-            vm.warn(`[${ex.code}], ${ex.message}`);
-            continue;
-          }
-          vm.fail();
-          throw ex;
-        }
-        if (isContinue) {
-          return;
-        }
-      }
-    }
-
-    if (functionName && deleteFunction) {
-      const vm = spinner(`Delete function ${serviceName}/${functionName}...`);
-      try {
-        await fcClient.deleteFunction(serviceName, functionName);
-        vm.succeed(`Delete function ${serviceName}/${functionName} success.`);
-      } catch (ex) {
-        if (!errorCode.includes(ex.code)) {
-          vm.fail();
-          throw ex;
-        }
-        vm.warn(`[${ex.code}], ${ex.message}`);
-      }
-    }
-
-    if (deleteService) {
-      const vm = spinner(`Delete service ${serviceName}...`);
-      try {
-        await fcClient.deleteService(serviceName);
-        vm.succeed(`Delete service ${serviceName} success.`);
-      } catch (ex) {
-        if (!errorCode.includes(ex.code)) {
-          vm.fail();
-          throw ex;
-        }
-        vm.warn(`[${ex.code}], ${ex.message}`);
-      }
-    }
-  }
 
   static async deploy(props: IProperties): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
