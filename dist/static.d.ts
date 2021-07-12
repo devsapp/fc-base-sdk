@@ -7,8 +7,8 @@ export declare const REMOVE_HELP_INFO: ({
     optionList: ({
         name: string;
         description: string;
-        alias: string;
         type: StringConstructor;
+        alias?: undefined;
     } | {
         name: string;
         description: string;
