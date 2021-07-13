@@ -6,6 +6,7 @@ import Deploy from './command/deploy';
 import Remove from './command/remove';
 import { REMOVE_HELP_INFO } from './static';
 
+const supportCommand = ['service', 'function', 'trigger'];
 export default class Component {
   @HLogger('FC-BASE-SDK') logger: ILogger;
 
@@ -29,8 +30,41 @@ export default class Component {
 
   async deploy(inputs: InputProps) {
     const newInputs = await this.initInputs(_.cloneDeep(inputs), 'deploy');
+    const apts = {
+      boolean: ['help'],
+      string: ['trigger-name', 'type'],
+      alias: { help: 'h' },
+    };
+    const parsedArgs: {[key: string]: any} = commandParse({ args: inputs.args }, apts);
+    const nonOptionsArgs = parsedArgs.data?._ || [];
+    const {
+      'trigger-name': triggerName,
+      type,
+    } = parsedArgs.data || {};
 
-    return await Deploy.deploy(newInputs.props);
+    if (nonOptionsArgs.length > 1) {
+      this.logger.error(' error: expects argument.');
+      return help();
+    }
+    if (!_.isEmpty(type) && !['config', 'code'].includes(type)) {
+      throw new Error(`Type does not support ${type}, only config and code are supported`);
+    }
+
+    const command = nonOptionsArgs[0];
+    if (command && !supportCommand.includes(command)) {
+      this.logger.error(` deploy ${command} is not supported now.`);
+      return help(REMOVE_HELP_INFO);
+    }
+
+    if (parsedArgs.data?.help) {
+      return help();
+    }
+
+    return await Deploy.deploy(newInputs.props, {
+      command,
+      type: type || 'all',
+      onlyDelpoyTriggerName: triggerName,
+    });
   }
 
   async remove(inputs: InputProps) {
@@ -58,7 +92,6 @@ export default class Component {
     }
 
     const command = nonOptionsArgs[0] || 'service';
-    const supportCommand = ['service', 'function', 'trigger'];
     if (!supportCommand.includes(command)) {
       this.logger.error(` remove ${command} is not supported now.`);
       return help(REMOVE_HELP_INFO);

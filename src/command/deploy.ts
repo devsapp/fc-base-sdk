@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable require-atomic-updates */
 import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
@@ -12,26 +13,55 @@ import { makeDestination } from './function-async-config';
 export default class Component {
   @HLogger('FC-BASE-SDK') static logger: ILogger;
 
-  static async deploy(props: IProperties): Promise<any> {
+  static async deploy(props: IProperties, { command, type, onlyDelpoyTriggerName }): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
-    const serviceName = service.name;
     const fcClient = Client.fcClient();
 
-    await this.makeService(fcClient, serviceName, service);
-
-    if (functionConfig) {
-      await this.makeFunction(fcClient, serviceName, functionConfig.name, functionConfig);
+    const deployConfig = type === 'all' || type === 'config';
+    if ((!command || command === 'service') && deployConfig) {
+      await this.makeService(fcClient, service);
     }
 
-    if (triggers) {
+    const commandIsFunction = command === 'function';
+    if (commandIsFunction && _.isEmpty(functionConfig)) {
+      throw new Error('The deployment function was specified, but the function configuration was not found');
+    }
+    if ((!command || commandIsFunction) && functionConfig) {
+      await this.makeFunction(fcClient, functionConfig, type);
+    }
+
+    const commandIsTirgger = command === 'trigger';
+    if (commandIsTirgger && _.isEmpty(triggers)) {
+      throw new Error('The deployment trigger was specified, but the trigger configuration was not found');
+    }
+    if ((!command || commandIsTirgger) && triggers) {
+      const deployOneTrigger = async (triggerConfig) => {
+        return await this.makeTrigger(
+          fcClient,
+          triggerConfig.service,
+          triggerConfig.function,
+          transfromTriggerConfig(triggerConfig, region, Client.credentials.AccountID),
+        );
+      };
+
+      if (commandIsTirgger && onlyDelpoyTriggerName) {
+        for (const triggerConfig of triggers) {
+          if (triggerConfig.name === onlyDelpoyTriggerName) {
+            await deployOneTrigger(triggerConfig);
+            return;
+          }
+        }
+        throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);
+      }
       for (const triggerConfig of triggers) {
-        await this.makeTrigger(fcClient, serviceName, triggerConfig.function, transfromTriggerConfig(triggerConfig, region, Client.credentials.AccountID));
+        await deployOneTrigger(triggerConfig);
       }
     }
   }
 
-  static async makeService(fcClient, name, serviceConfig) {
+  static async makeService(fcClient, serviceConfig) {
     const {
+      name,
       vpcConfig,
       nasConfig,
       logConfig,
@@ -101,8 +131,12 @@ export default class Component {
     return res;
   }
 
-  static async makeFunction(fcClient, serviceName, functionName, functionConfig) {
+  static async makeFunction(fcClient, functionConfig, type) {
+    const serviceName = functionConfig.service;
+    const functionName = functionConfig.name;
     const vm = spinner(`Make function ${serviceName}/${functionName}...`);
+    const onlyDeployConfig = type === 'config';
+    const onlyDeployCode = type === 'code';
 
     const {
       filename,
@@ -115,15 +149,28 @@ export default class Component {
     } = functionConfig;
     delete functionConfig.asyncConfiguration;
 
-    if (filename) {
-      functionConfig.code = {
-        zipFile: fs.readFileSync(filename, 'base64'),
-      };
-    } else if (ossBucket && ossKey) {
-      functionConfig.code = {
-        ossBucketName: ossBucket,
-        ossObjectName: ossKey,
-      };
+    if (!onlyDeployConfig) {
+      if (filename) {
+        functionConfig.code = {
+          zipFile: fs.readFileSync(filename, 'base64'),
+        };
+      } else if (ossBucket && ossKey) {
+        functionConfig.code = {
+          ossBucketName: ossBucket,
+          ossObjectName: ossKey,
+        };
+      }
+
+      if (onlyDeployCode) {
+        try {
+          await fcClient.updateFunction(serviceName, functionName, { code: functionConfig.code });
+          vm.succeed(`Make function ${serviceName}/${functionName} code success.`);
+        } catch (ex) {
+          vm.fail();
+          throw ex;
+        }
+        return;
+      }
     }
 
     const emptyProp = {
@@ -138,7 +185,7 @@ export default class Component {
       if (!isCustomContainerConfig(customContainerConfig)) {
         throw new Error(`${serviceName}/${functionName} runtime is custom-container, but customContainerConfig is not configured.`);
       }
-    } else if (!isCode(functionConfig.code)) {
+    } else if (!onlyDeployConfig && !isCode(functionConfig.code)) {
       throw new Error(`${serviceName}/${functionName} code is not configured.`);
     }
 
@@ -150,7 +197,7 @@ export default class Component {
     try {
       res = await fcClient.updateFunction(serviceName, functionName, functionConfig);
     } catch (ex) {
-      if (ex.code !== 'FunctionNotFound') {
+      if (ex.code !== 'FunctionNotFound' || onlyDeployConfig) {
         this.logger.debug(`ex code: ${ex.code}, ex: ${ex.message}`);
         vm.fail();
         throw ex;
