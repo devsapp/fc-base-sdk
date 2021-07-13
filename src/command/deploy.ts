@@ -147,6 +147,7 @@ export default class Component {
       asyncConfiguration,
       instanceLifecycleConfig,
     } = functionConfig;
+    functionConfig.initializer = functionConfig.initializer || '';
     delete functionConfig.asyncConfiguration;
 
     if (!onlyDeployConfig) {
