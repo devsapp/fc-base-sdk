@@ -44,7 +44,7 @@ export default class Component {
 
     if (nonOptionsArgs.length > 1) {
       this.logger.error(' error: expects argument.');
-      return help();
+      return help('');
     }
     if (!_.isEmpty(type) && !['config', 'code'].includes(type)) {
       throw new Error(`Type does not support ${type}, only config and code are supported`);
@@ -53,7 +53,7 @@ export default class Component {
     const command = nonOptionsArgs[0];
     if (command && !supportCommand.includes(command)) {
       this.logger.error(` deploy ${command} is not supported now.`);
-      return help(REMOVE_HELP_INFO);
+      return help('');
     }
 
     if (parsedArgs.data?.help) {
