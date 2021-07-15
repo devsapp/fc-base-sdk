@@ -97,7 +97,7 @@ export default class Component {
       return help(REMOVE_HELP_INFO);
     }
     const remove = new Remove(props.region);
-    await remove[command](props, { force, triggerName, silent });
+    await remove[command](props, { force, triggerName, silent }, command);
     return remove.removeNameList;
   }
 }
