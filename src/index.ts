@@ -6,7 +6,7 @@ import Deploy from './command/deploy';
 import Remove from './command/remove';
 import { REMOVE_HELP_INFO } from './static';
 
-const supportCommand = ['service', 'function', 'trigger'];
+const supportCommand = ['all', 'service', 'function', 'trigger'];
 export default class Component {
   @HLogger('FC-BASE-SDK') logger: ILogger;
 
@@ -71,20 +71,20 @@ export default class Component {
     const { args = '', props } = await this.initInputs(_.cloneDeep(inputs), 'remove');
 
     /**
-     * 如果指定了 only-local，那么不和远端交互，仅删除传入配置【权重大于 y/assume-yes】
+     * 如果指定了 use-local，那么不和远端交互，仅删除传入配置【权重大于 y/assume-yes】
      * 如果指定了 y/assume-yes，那么就强制删除线上所有配置，为防止没有权限查询线上所有，并尝试删除传入的配置
-     * 如果没有指定 only-local、y/assume-yes，那么拿远端资源和传入配置做对比，如果远端存在传入配置没有的资源，则提示是否删除额外的所有此项子资源
+     * 如果没有指定 use-local、y/assume-yes，那么拿远端资源和传入配置做对比，如果远端存在传入配置没有的资源，则提示是否删除额外的所有此项子资源
      *  - 如果选择 yes，行为类同 y/assume-yes
-     *  - 如果选择 no，行为类同 only-local
+     *  - 如果选择 no，行为类同 use-local
      */
     const apts = {
-      boolean: ['help', 'y', 'only-local'],
+      boolean: ['help', 'y', 'use-local'],
       string: ['trigger-name'],
       alias: { help: 'h', triggerName: 'trigger-name', 'assume-yes': 'y' },
     };
     const parsedArgs: {[key: string]: any} = commandParse({ args }, apts);
     const nonOptionsArgs = parsedArgs.data?._ || [];
-    const { y: force, triggerName, 'only-local': silent } = parsedArgs.data || {};
+    const { y: force, triggerName, 'use-local': silent } = parsedArgs.data || {};
 
     if (nonOptionsArgs.length > 1) {
       this.logger.error(' error: expects argument.');

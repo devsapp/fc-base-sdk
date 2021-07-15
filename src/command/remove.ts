@@ -152,6 +152,10 @@ export default class Component {
     await this.deleteService(serviceName);
   }
 
+  async all(props: IProperties, removeInputs: RemoveInputsProps) {
+    await this.service(props, removeInputs);
+  }
+
   private async deleteService(serviceName) {
     const vm = spinner(`Delete service ${serviceName}...`);
     try {
