@@ -14,6 +14,7 @@ export default class Component {
     trigger(props: IProperties, { force, silent, triggerName }: RemoveInputsProps, command?: string): Promise<void>;
     function(props: IProperties, { force, silent }: RemoveInputsProps, command?: string): Promise<void>;
     service(props: IProperties, { force, silent }: RemoveInputsProps): Promise<void>;
+    all(props: IProperties, removeInputs: RemoveInputsProps): Promise<void>;
     private deleteService;
     private deleteFunction;
     private deleteTrigger;
