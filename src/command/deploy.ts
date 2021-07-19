@@ -16,10 +16,11 @@ export default class Component {
   static async deploy(props: IProperties, { command, type, onlyDelpoyTriggerName }): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
     const fcClient = Client.fcClient();
+    const deployRes: any = {};
 
     const deployConfig = type === 'all' || type === 'config';
     if ((!command || command === 'service') && deployConfig) {
-      await this.makeService(fcClient, service);
+      deployRes.service = await this.makeService(fcClient, service);
     }
 
     const commandIsFunction = command === 'function';
@@ -27,7 +28,7 @@ export default class Component {
       throw new Error('The deployment function was specified, but the function configuration was not found');
     }
     if ((!command || commandIsFunction) && functionConfig) {
-      await this.makeFunction(fcClient, functionConfig, type);
+      deployRes.function = await this.makeFunction(fcClient, functionConfig, type);
     }
 
     const commandIsTirgger = command === 'trigger';
@@ -35,6 +36,7 @@ export default class Component {
       throw new Error('The deployment trigger was specified, but the trigger configuration was not found');
     }
     if ((!command || commandIsTirgger) && triggers) {
+      const triggersRes = [];
       const deployOneTrigger = async (triggerConfig) => {
         return await this.makeTrigger(
           fcClient,
@@ -47,16 +49,19 @@ export default class Component {
       if (commandIsTirgger && onlyDelpoyTriggerName) {
         for (const triggerConfig of triggers) {
           if (triggerConfig.name === onlyDelpoyTriggerName) {
-            await deployOneTrigger(triggerConfig);
+            triggersRes.push(await deployOneTrigger(triggerConfig));
             return;
           }
         }
         throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);
       }
       for (const triggerConfig of triggers) {
-        await deployOneTrigger(triggerConfig);
+        triggersRes.push(await deployOneTrigger(triggerConfig));
       }
+      deployRes.triggers = triggersRes;
     }
+
+    return deployRes;
   }
 
   static async makeService(fcClient, serviceConfig) {

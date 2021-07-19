@@ -5,28 +5,11 @@ import _ from 'lodash';
 import Deploy from './command/deploy';
 import Remove from './command/remove';
 import { REMOVE_HELP_INFO } from './static';
+import Base from './common/base';
 
 const supportCommand = ['all', 'service', 'function', 'trigger'];
-export default class Component {
+export default class Component extends Base {
   @HLogger('FC-BASE-SDK') logger: ILogger;
-
-  async initInputs(inputs: InputProps, command: string) {
-    const { region } = inputs.props;
-    if (!inputs.credentials) {
-      inputs.credentials = await getCredential(inputs.project.access);
-    }
-
-    reportComponent('FC-BASE-SDK', {
-      command,
-      uid: inputs.credentials.AccountID,
-    });
-
-    Client.credentials = inputs.credentials;
-    Client.region = region;
-
-    this.logger.debug(JSON.stringify(_.pick(inputs, ['props', 'appName', 'project', 'args']), null, '  '));
-    return inputs;
-  }
 
   async deploy(inputs: InputProps) {
     const newInputs = await this.initInputs(_.cloneDeep(inputs), 'deploy');
@@ -60,10 +43,14 @@ export default class Component {
       return help();
     }
 
-    return await Deploy.deploy(newInputs.props, {
+    const deployRes = await Deploy.deploy(newInputs.props, {
       command,
       type: type || 'all',
       onlyDelpoyTriggerName: triggerName,
+    });
+    super.__report({
+      name: 'fc',
+      content: this.reportNames(newInputs.props.region, deployRes),
     });
   }
 
@@ -98,6 +85,41 @@ export default class Component {
     }
     const remove = new Remove(props.region);
     await remove[command](props, { force, triggerName, silent }, command);
+    super.__report({ name: 'fc', content: { region: '', service: '', function: '', triggers: [] } });
     return remove.removeNameList;
+  }
+
+  private reportNames(region, data: any) {
+    const dataNames: ServerlessDevsReport.Fc = {
+      region,
+    };
+    if (!_.isEmpty(data.service)) {
+      dataNames.service = data.service?.data?.serviceName;
+    }
+    if (!_.isEmpty(data.function)) {
+      dataNames.function = data.function?.data?.functionName;
+    }
+    if (!_.isEmpty(data.triggers)) {
+      dataNames.triggers = data.triggers.map(item => item?.data?.triggerName);
+    }
+    return dataNames;
+  }
+
+  private async initInputs(inputs: InputProps, command: string) {
+    const { region } = inputs.props;
+    if (!inputs.credentials) {
+      inputs.credentials = await getCredential(inputs.project.access);
+    }
+
+    reportComponent('FC-BASE-SDK', {
+      command,
+      uid: inputs.credentials.AccountID,
+    });
+
+    Client.credentials = inputs.credentials;
+    Client.region = region;
+
+    this.logger.debug(JSON.stringify(_.pick(inputs, ['props', 'appName', 'project', 'args']), null, '  '));
+    return inputs;
   }
 }

@@ -182,7 +182,7 @@ export default class Component {
       vm.succeed(`Delete function ${serviceName}/${functionName} success.`);
 
       this.removeNameList.functions || (this.removeNameList.functions = []);
-      this.removeNameList.functions.push({ serviceName, functionName });
+      this.removeNameList.functions.push(functionName);
 
       const stateId = `${this.fcClient.accountid}-${this.region}-${serviceName}-${functionName}`;
       await this.unsetState(stateId);
@@ -202,7 +202,7 @@ export default class Component {
       vm.succeed(`Delete trigger ${serviceName}/${functionName}/${triggerName} success.`);
 
       this.removeNameList.triggers || (this.removeNameList.triggers = []);
-      this.removeNameList.triggers.push({ serviceName, functionName, triggerName });
+      this.removeNameList.triggers.push(triggerName);
 
       const stateId = `${this.fcClient.accountid}-${this.region}-${serviceName}-${functionName}-${triggerName}`;
       await this.unsetState(stateId);
