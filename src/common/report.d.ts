@@ -8,6 +8,7 @@ declare namespace ServerlessDevsReport {
 
   export interface ReportData {
     name: string;
+    access: string;
     content: Fc;
   }
 }

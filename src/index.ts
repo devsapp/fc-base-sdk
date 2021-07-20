@@ -50,6 +50,7 @@ export default class Component extends Base {
     });
     super.__report({
       name: 'fc',
+      access: inputs.project?.access,
       content: this.reportNames(newInputs.props.region, deployRes),
     });
   }
@@ -85,7 +86,11 @@ export default class Component extends Base {
     }
     const remove = new Remove(props.region);
     await remove[command](props, { force, triggerName, silent }, command);
-    super.__report({ name: 'fc', content: { region: '', service: '', function: '', triggers: [] } });
+    super.__report({
+      name: 'fc',
+      access: inputs.project?.access,
+      content: { region: '', service: '', function: '', triggers: [] },
+    });
     return remove.removeNameList;
   }
 
@@ -100,7 +105,7 @@ export default class Component extends Base {
       dataNames.function = data.function?.data?.functionName;
     }
     if (!_.isEmpty(data.triggers)) {
-      dataNames.triggers = data.triggers.map(item => item?.data?.triggerName);
+      dataNames.triggers = data.triggers.map((item) => item?.data?.triggerName);
     }
     return dataNames;
   }
@@ -108,7 +113,7 @@ export default class Component extends Base {
   private async initInputs(inputs: InputProps, command: string) {
     const { region } = inputs.props;
     if (!inputs.credentials) {
-      inputs.credentials = await getCredential(inputs.project.access);
+      inputs.credentials = await getCredential(inputs.project?.access);
     }
 
     reportComponent('FC-BASE-SDK', {
