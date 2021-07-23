@@ -245,6 +245,9 @@ export default class Component {
     const { triggerName } = triggerConfig;
 
     const vm = spinner(`Make trigger ${serviceName}/${functionName}/${triggerName}...`);
+    if (triggerConfig.qualifier) {
+      triggerConfig.qualifier = triggerConfig.qualifier.toString();
+    }
 
     let res;
     try {
