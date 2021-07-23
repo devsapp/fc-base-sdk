@@ -49,8 +49,9 @@ export default class Component {
       if (commandIsTirgger && onlyDelpoyTriggerName) {
         for (const triggerConfig of triggers) {
           if (triggerConfig.name === onlyDelpoyTriggerName) {
-            triggersRes.push(await deployOneTrigger(triggerConfig));
-            return;
+            return {
+              triggers: [await deployOneTrigger(triggerConfig)],
+            };
           }
         }
         throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);

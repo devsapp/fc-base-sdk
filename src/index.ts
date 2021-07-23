@@ -48,11 +48,15 @@ export default class Component extends Base {
       type: type || 'all',
       onlyDelpoyTriggerName: triggerName,
     });
-    super.__report({
-      name: 'fc',
-      access: inputs.project?.access,
-      content: this.reportNames(newInputs.props.region, deployRes),
-    });
+    try {
+      super.__report({
+        name: 'fc',
+        access: inputs.project?.access,
+        content: this.reportNames(newInputs.props.region, deployRes),
+      });
+    } catch (e) {
+      this.logger.debug(`db report error: ${e.toString()}`);
+    }
   }
 
   async remove(inputs: InputProps) {
