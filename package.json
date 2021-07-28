@@ -28,7 +28,7 @@
   "scripts": {
     "start": "npm run watch",
     "watch": "npx tsc -w -p tsconfig.json",
-    "prebuild": "rimraf dist",
+    "prebuild": "rm -rf node_modules && rm -rf package-lock.json && npm i && rimraf dist",
     "build": "npm run fix && npx tsc -p tsconfig.json",
     "test": "jest",
     "test:cov": "jest --coverage",

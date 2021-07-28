@@ -15,7 +15,7 @@ export default class Component {
 
   static async deploy(props: IProperties, { command, type, onlyDelpoyTriggerName }): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
-    const fcClient = Client.fcClient();
+    const fcClient = await Client.fcClient();
     const deployRes: any = {};
 
     const deployConfig = type === 'all' || type === 'config';
