@@ -21,10 +21,10 @@ export default class Component {
 
   constructor(region) {
     this.region = region;
-    this.fcClient = Client.fcClient();
   }
 
   async trigger(props: IProperties, { force, silent, triggerName }: RemoveInputsProps, command?: string) {
+    if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const { service, function: functionConfig, triggers = [] } = props;
     const serviceName = service?.name || functionConfig?.service;
     const functionName = functionConfig?.name;
@@ -84,6 +84,7 @@ export default class Component {
   }
 
   async function(props: IProperties, { force, silent }: RemoveInputsProps, command?: string) {
+    if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const serviceName = props.service?.name || props.function?.service;
     const functionName = props.function?.name || '';
 
@@ -143,6 +144,7 @@ export default class Component {
   }
 
   async service(props: IProperties, { force, silent }: RemoveInputsProps) {
+    if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const serviceName = props.service?.name;
     if (_.isEmpty(serviceName)) {
       throw new Error('Delete service, service name cannot be empty');

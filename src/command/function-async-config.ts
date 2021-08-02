@@ -9,7 +9,7 @@ export async function makeDestination({
 }) {
   const accountId = Client.credentials.AccountID;
   const { region } = Client;
-  const fcClient = Client.fcClient();
+  const fcClient = await Client.fcClient();
 
   if (!_.isEmpty(asyncConfiguration)) {
     const destination = asyncConfiguration.destination || {};
