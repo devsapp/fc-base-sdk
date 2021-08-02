@@ -51,7 +51,9 @@ function makeDestination(_a) {
                 case 0:
                     accountId = client_1.default.credentials.AccountID;
                     region = client_1.default.region;
-                    fcClient = client_1.default.fcClient();
+                    return [4 /*yield*/, client_1.default.fcClient()];
+                case 1:
+                    fcClient = _c.sent();
                     if (!lodash_1.default.isEmpty(asyncConfiguration)) {
                         destination = asyncConfiguration.destination || {};
                         onSuccess = destination.onSuccess, onFailure = destination.onFailure;
@@ -70,11 +72,11 @@ function makeDestination(_a) {
                         asyncConfiguration.destinationConfig = destinationConfig;
                     }
                     hasAsyncConfig = false;
-                    _c.label = 1;
-                case 1:
-                    _c.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, fcClient.getFunctionAsyncConfig(serviceName, functionName, qualifier)];
+                    _c.label = 2;
                 case 2:
+                    _c.trys.push([2, 4, , 5]);
+                    return [4 /*yield*/, fcClient.getFunctionAsyncConfig(serviceName, functionName, qualifier)];
+                case 3:
                     data = (_c.sent()).data;
                     asyncConfigCache = {
                         destinationConfig: data.destinationConfig,
@@ -86,29 +88,29 @@ function makeDestination(_a) {
                         return [2 /*return*/];
                     }
                     hasAsyncConfig = true;
-                    return [3 /*break*/, 4];
-                case 3:
+                    return [3 /*break*/, 5];
+                case 4:
                     ex_1 = _c.sent();
                     if (ex_1.code !== 'AsyncConfigNotExists') {
                         throw ex_1;
                     }
-                    return [3 /*break*/, 4];
-                case 4:
-                    if (!hasAsyncConfig) return [3 /*break*/, 6];
-                    return [4 /*yield*/, fcClient.deleteFunctionAsyncConfig(serviceName, functionName, qualifier)];
+                    return [3 /*break*/, 5];
                 case 5:
-                    _c.sent();
-                    _c.label = 6;
+                    if (!hasAsyncConfig) return [3 /*break*/, 7];
+                    return [4 /*yield*/, fcClient.deleteFunctionAsyncConfig(serviceName, functionName, qualifier)];
                 case 6:
-                    if (!asyncConfiguration) return [3 /*break*/, 8];
-                    return [4 /*yield*/, fcClient.putFunctionAsyncConfig(serviceName, functionName, qualifier, asyncConfiguration)];
-                case 7:
                     _c.sent();
-                    _c.label = 8;
-                case 8: return [2 /*return*/];
+                    _c.label = 7;
+                case 7:
+                    if (!asyncConfiguration) return [3 /*break*/, 9];
+                    return [4 /*yield*/, fcClient.putFunctionAsyncConfig(serviceName, functionName, qualifier, asyncConfiguration)];
+                case 8:
+                    _c.sent();
+                    _c.label = 9;
+                case 9: return [2 /*return*/];
             }
         });
     });
 }
 exports.makeDestination = makeDestination;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZnVuY3Rpb24tYXN5bmMtY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2NvbW1hbmQvZnVuY3Rpb24tYXN5bmMtY29uZmlnLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUF1QjtBQUN2QiwyREFBcUM7QUFFckMsU0FBc0IsZUFBZSxDQUFDLEVBS3JDO1FBSkMsV0FBVyxpQkFBQSxFQUNYLFlBQVksa0JBQUEsRUFDWixrQkFBa0Isd0JBQUEsRUFDbEIsaUJBQW9CLEVBQXBCLFNBQVMsbUJBQUcsUUFBUSxLQUFBOzs7Ozs7b0JBRWQsU0FBUyxHQUFHLGdCQUFNLENBQUMsV0FBVyxDQUFDLFNBQVMsQ0FBQztvQkFDdkMsTUFBTSxHQUFLLGdCQUFNLE9BQVgsQ0FBWTtvQkFDcEIsUUFBUSxHQUFHLGdCQUFNLENBQUMsUUFBUSxFQUFFLENBQUM7b0JBRW5DLElBQUksQ0FBQyxnQkFBQyxDQUFDLE9BQU8sQ0FBQyxrQkFBa0IsQ0FBQyxFQUFFO3dCQUM1QixXQUFXLEdBQUcsa0JBQWtCLENBQUMsV0FBVyxJQUFJLEVBQUUsQ0FBQzt3QkFDakQsU0FBUyxHQUFnQixXQUFXLFVBQTNCLEVBQUUsU0FBUyxHQUFLLFdBQVcsVUFBaEIsQ0FBaUI7d0JBQzdDLE9BQU8sa0JBQWtCLENBQUMsV0FBVyxDQUFDO3dCQUVoQyxpQkFBaUIsR0FBUSxFQUFFLENBQUM7d0JBQ2xDLElBQUksU0FBUyxFQUFFOzRCQUNiLGlCQUFpQixDQUFDLFNBQVMsR0FBRztnQ0FDNUIsV0FBVyxFQUFFLFNBQVMsQ0FBQyxPQUFPLENBQUMsS0FBSyxFQUFFLE1BQUksTUFBTSxTQUFJLFNBQVMsTUFBRyxDQUFDOzZCQUNsRSxDQUFDO3lCQUNIO3dCQUNELElBQUksU0FBUyxFQUFFOzRCQUNiLGlCQUFpQixDQUFDLFNBQVMsR0FBRztnQ0FDNUIsV0FBVyxFQUFFLFNBQVMsQ0FBQyxPQUFPLENBQUMsS0FBSyxFQUFFLE1BQUksTUFBTSxTQUFJLFNBQVMsTUFBRyxDQUFDOzZCQUNsRSxDQUFDO3lCQUNIO3dCQUNELGtCQUFrQixDQUFDLGlCQUFpQixHQUFHLGlCQUFpQixDQUFDO3FCQUMxRDtvQkFFRyxjQUFjLEdBQUcsS0FBSyxDQUFDOzs7O29CQUVSLHFCQUFNLFFBQVEsQ0FBQyxzQkFBc0IsQ0FBQyxXQUFXLEVBQUUsWUFBWSxFQUFFLFNBQVMsQ0FBQyxFQUFBOztvQkFBcEYsSUFBSSxHQUFLLENBQUEsU0FBMkUsQ0FBQSxLQUFoRjtvQkFDTixnQkFBZ0IsR0FBRzt3QkFDdkIsaUJBQWlCLEVBQUUsSUFBSSxDQUFDLGlCQUFpQjt3QkFDekMseUJBQXlCLEVBQUUsSUFBSSxDQUFDLHlCQUF5Qjt3QkFDekQsa0JBQWtCLEVBQUUsSUFBSSxDQUFDLGtCQUFrQjt3QkFDM0MscUJBQXFCLEVBQUUsSUFBSSxDQUFDLHFCQUFxQjtxQkFDbEQsQ0FBQztvQkFDRixJQUFJLGdCQUFDLENBQUMsT0FBTyxDQUFDLGtCQUFrQixFQUFFLGdCQUFnQixDQUFDLEVBQUU7d0JBQ25ELHNCQUFPO3FCQUNSO29CQUNELGNBQWMsR0FBRyxJQUFJLENBQUM7Ozs7b0JBRXRCLElBQUksSUFBRSxDQUFDLElBQUksS0FBSyxzQkFBc0IsRUFBRTt3QkFDdEMsTUFBTSxJQUFFLENBQUM7cUJBQ1Y7Ozt5QkFHQyxjQUFjLEVBQWQsd0JBQWM7b0JBQ2hCLHFCQUFNLFFBQVEsQ0FBQyx5QkFBeUIsQ0FBQyxXQUFXLEVBQUUsWUFBWSxFQUFFLFNBQVMsQ0FBQyxFQUFBOztvQkFBOUUsU0FBOEUsQ0FBQzs7O3lCQUc3RSxrQkFBa0IsRUFBbEIsd0JBQWtCO29CQUNwQixxQkFBTSxRQUFRLENBQUMsc0JBQXNCLENBQUMsV0FBVyxFQUFFLFlBQVksRUFBRSxTQUFTLEVBQUUsa0JBQWtCLENBQUMsRUFBQTs7b0JBQS9GLFNBQStGLENBQUM7Ozs7OztDQUVuRztBQXZERCwwQ0F1REMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZnVuY3Rpb24tYXN5bmMtY29uZmlnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2NvbW1hbmQvZnVuY3Rpb24tYXN5bmMtY29uZmlnLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLGtEQUF1QjtBQUN2QiwyREFBcUM7QUFFckMsU0FBc0IsZUFBZSxDQUFDLEVBS3JDO1FBSkMsV0FBVyxpQkFBQSxFQUNYLFlBQVksa0JBQUEsRUFDWixrQkFBa0Isd0JBQUEsRUFDbEIsaUJBQW9CLEVBQXBCLFNBQVMsbUJBQUcsUUFBUSxLQUFBOzs7Ozs7b0JBRWQsU0FBUyxHQUFHLGdCQUFNLENBQUMsV0FBVyxDQUFDLFNBQVMsQ0FBQztvQkFDdkMsTUFBTSxHQUFLLGdCQUFNLE9BQVgsQ0FBWTtvQkFDVCxxQkFBTSxnQkFBTSxDQUFDLFFBQVEsRUFBRSxFQUFBOztvQkFBbEMsUUFBUSxHQUFHLFNBQXVCO29CQUV4QyxJQUFJLENBQUMsZ0JBQUMsQ0FBQyxPQUFPLENBQUMsa0JBQWtCLENBQUMsRUFBRTt3QkFDNUIsV0FBVyxHQUFHLGtCQUFrQixDQUFDLFdBQVcsSUFBSSxFQUFFLENBQUM7d0JBQ2pELFNBQVMsR0FBZ0IsV0FBVyxVQUEzQixFQUFFLFNBQVMsR0FBSyxXQUFXLFVBQWhCLENBQWlCO3dCQUM3QyxPQUFPLGtCQUFrQixDQUFDLFdBQVcsQ0FBQzt3QkFFaEMsaUJBQWlCLEdBQVEsRUFBRSxDQUFDO3dCQUNsQyxJQUFJLFNBQVMsRUFBRTs0QkFDYixpQkFBaUIsQ0FBQyxTQUFTLEdBQUc7Z0NBQzVCLFdBQVcsRUFBRSxTQUFTLENBQUMsT0FBTyxDQUFDLEtBQUssRUFBRSxNQUFJLE1BQU0sU0FBSSxTQUFTLE1BQUcsQ0FBQzs2QkFDbEUsQ0FBQzt5QkFDSDt3QkFDRCxJQUFJLFNBQVMsRUFBRTs0QkFDYixpQkFBaUIsQ0FBQyxTQUFTLEdBQUc7Z0NBQzVCLFdBQVcsRUFBRSxTQUFTLENBQUMsT0FBTyxDQUFDLEtBQUssRUFBRSxNQUFJLE1BQU0sU0FBSSxTQUFTLE1BQUcsQ0FBQzs2QkFDbEUsQ0FBQzt5QkFDSDt3QkFDRCxrQkFBa0IsQ0FBQyxpQkFBaUIsR0FBRyxpQkFBaUIsQ0FBQztxQkFDMUQ7b0JBRUcsY0FBYyxHQUFHLEtBQUssQ0FBQzs7OztvQkFFUixxQkFBTSxRQUFRLENBQUMsc0JBQXNCLENBQUMsV0FBVyxFQUFFLFlBQVksRUFBRSxTQUFTLENBQUMsRUFBQTs7b0JBQXBGLElBQUksR0FBSyxDQUFBLFNBQTJFLENBQUEsS0FBaEY7b0JBQ04sZ0JBQWdCLEdBQUc7d0JBQ3ZCLGlCQUFpQixFQUFFLElBQUksQ0FBQyxpQkFBaUI7d0JBQ3pDLHlCQUF5QixFQUFFLElBQUksQ0FBQyx5QkFBeUI7d0JBQ3pELGtCQUFrQixFQUFFLElBQUksQ0FBQyxrQkFBa0I7d0JBQzNDLHFCQUFxQixFQUFFLElBQUksQ0FBQyxxQkFBcUI7cUJBQ2xELENBQUM7b0JBQ0YsSUFBSSxnQkFBQyxDQUFDLE9BQU8sQ0FBQyxrQkFBa0IsRUFBRSxnQkFBZ0IsQ0FBQyxFQUFFO3dCQUNuRCxzQkFBTztxQkFDUjtvQkFDRCxjQUFjLEdBQUcsSUFBSSxDQUFDOzs7O29CQUV0QixJQUFJLElBQUUsQ0FBQyxJQUFJLEtBQUssc0JBQXNCLEVBQUU7d0JBQ3RDLE1BQU0sSUFBRSxDQUFDO3FCQUNWOzs7eUJBR0MsY0FBYyxFQUFkLHdCQUFjO29CQUNoQixxQkFBTSxRQUFRLENBQUMseUJBQXlCLENBQUMsV0FBVyxFQUFFLFlBQVksRUFBRSxTQUFTLENBQUMsRUFBQTs7b0JBQTlFLFNBQThFLENBQUM7Ozt5QkFHN0Usa0JBQWtCLEVBQWxCLHdCQUFrQjtvQkFDcEIscUJBQU0sUUFBUSxDQUFDLHNCQUFzQixDQUFDLFdBQVcsRUFBRSxZQUFZLEVBQUUsU0FBUyxFQUFFLGtCQUFrQixDQUFDLEVBQUE7O29CQUEvRixTQUErRixDQUFDOzs7Ozs7Q0FFbkc7QUF2REQsMENBdURDIn0=
