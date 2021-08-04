@@ -44,7 +44,7 @@ export default class Component extends Base {
     }
 
     const deployRes = await Deploy.deploy(newInputs.props, {
-      command,
+      command: command === 'all' ? '' : command,
       type: type || 'all',
       onlyDelpoyTriggerName: triggerName,
     });
