@@ -3,7 +3,6 @@
 import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
 import _ from 'lodash';
-// import path from 'path';
 import Client from '../utils/client';
 import { transfromTriggerConfig } from '../utils/utils';
 import { IProperties } from '../common/entity';
