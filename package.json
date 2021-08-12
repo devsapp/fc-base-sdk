@@ -1,6 +1,6 @@
 {
   "name": "fc-base-sdk",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./dist/index.js",
   "dependencies": {
     "@alicloud/fc2": "^2.2.2",
@@ -29,7 +29,8 @@
     "start": "npm run watch",
     "watch": "npx tsc -w -p tsconfig.json",
     "prebuild": "rm -rf node_modules && rm -rf package-lock.json && npm i && rimraf dist",
-    "build": "npm run fix && npm run lint && ncc build src/index.ts -m -o dist",
+    "build": "npm run fix && npm run lint && ncc build src/index.ts -m -e @serverless-devs/core -o dist",
+    "postbuild": "npm run doc && rm -rf package-lock.json && rm -rf node_modules",
     "test": "jest",
     "test:cov": "jest --coverage",
     "lint": "f2elint scan",

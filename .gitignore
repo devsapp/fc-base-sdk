@@ -15,3 +15,4 @@ lib
 .cache
 package-lock.json
 !**/src/lib
+dist
