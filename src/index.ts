@@ -16,12 +16,12 @@ export default class Component extends Base {
     const apts = {
       boolean: ['help'],
       string: ['trigger-name', 'type'],
-      alias: { help: 'h' },
+      alias: { help: 'h', triggerName: 'trigger-name' },
     };
     const parsedArgs: {[key: string]: any} = commandParse({ args: inputs.args }, apts);
     const nonOptionsArgs = parsedArgs.data?._ || [];
     const {
-      'trigger-name': triggerName,
+      triggerName,
       type,
     } = parsedArgs.data || {};
 
@@ -76,7 +76,7 @@ export default class Component extends Base {
     };
     const parsedArgs: {[key: string]: any} = commandParse({ args }, apts);
     const nonOptionsArgs = parsedArgs.data?._ || [];
-    const { y: force, triggerName, 'use-local': silent } = parsedArgs.data || {};
+    const { y: force, triggerName, 'use-local': useLocal } = parsedArgs.data || {};
 
     if (nonOptionsArgs.length > 1) {
       this.logger.error(' error: expects argument.');
@@ -89,7 +89,7 @@ export default class Component extends Base {
       return help(REMOVE_HELP_INFO);
     }
     const remove = new Remove(props.region);
-    await remove[command](props, { force, triggerName, silent }, command);
+    await remove[command](props, { force, triggerName, useLocal }, command);
     super.__report({
       name: 'fc',
       access: inputs.project?.access,
@@ -116,7 +116,7 @@ export default class Component extends Base {
 
   private async initInputs(inputs: InputProps, command: string) {
     const { region } = inputs.props;
-    if (!inputs.credentials) {
+    if (_.isEmpty(inputs.credentials)) {
       inputs.credentials = await getCredential(inputs.project?.access);
     }
 

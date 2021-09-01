@@ -4,7 +4,7 @@ import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
 import _ from 'lodash';
 import Client from '../utils/client';
-import { transfromTriggerConfig } from '../utils/utils';
+import { getTargetTriggers, transfromTriggerConfig } from '../utils/utils';
 import { IProperties } from '../common/entity';
 import { isCode, isCustomContainerConfig } from '../interface/function';
 import { makeDestination } from './function-async-config';
@@ -12,51 +12,62 @@ import { makeDestination } from './function-async-config';
 export default class Component {
   @HLogger('FC-BASE-SDK') static logger: ILogger;
 
+  /**
+   * 部署资源
+   * @param props
+   * @param param1
+   *  command: 执行的二级指令：service、function、trigger 或者为空，为空时部署所有
+   *  type：部署的类型：all、config、code
+   *  onlyDelpoyTriggerName：当 command 为 trigger 时生效，仅部署哪些触发器
+   * @returns
+   */
   static async deploy(props: IProperties, { command, type, onlyDelpoyTriggerName }): Promise<any> {
     const { region, service, function: functionConfig, triggers } = props;
-    const fcClient = await Client.fcClient();
-    const deployRes: any = {};
+    const deployAllConfig = !command && (type === 'all' || type === 'config');
 
-    const deployConfig = type === 'all' || type === 'config';
-    if ((!command || command === 'service') && deployConfig) {
-      deployRes.service = await this.makeService(fcClient, service);
-    }
-
+    // 校验配置
     const commandIsFunction = command === 'function';
     if (commandIsFunction && _.isEmpty(functionConfig)) {
       throw new Error('The deployment function was specified, but the function configuration was not found');
     }
-    if ((!command || commandIsFunction) && functionConfig) {
-      deployRes.function = await this.makeFunction(fcClient, functionConfig, type);
-    }
-
     const commandIsTirgger = command === 'trigger';
     if (commandIsTirgger && _.isEmpty(triggers)) {
       throw new Error('The deployment trigger was specified, but the trigger configuration was not found');
     }
-    if ((!command || commandIsTirgger) && triggers) {
+    let deployTriggers = [];
+    const needDeployTrigger = deployAllConfig || commandIsTirgger;
+    if (needDeployTrigger && triggers) {
+      if (commandIsTirgger && onlyDelpoyTriggerName) {
+        deployTriggers = getTargetTriggers(triggers, onlyDelpoyTriggerName);
+      } else {
+        deployTriggers = triggers;
+      }
+    }
+
+    const deployRes: any = {};
+    const fcClient = await Client.fcClient();
+
+    // 开始部署
+    const needDeployService = deployAllConfig || command === 'service';
+    if (needDeployService) {
+      deployRes.service = await this.makeService(fcClient, service);
+    }
+
+    const needDeployFunction = !command || commandIsFunction;
+    if (needDeployFunction && functionConfig) {
+      deployRes.function = await this.makeFunction(fcClient, functionConfig, type);
+    }
+
+    if (!_.isEmpty(deployTriggers)) {
       const triggersRes = [];
-      const deployOneTrigger = async (triggerConfig) => {
-        return await this.makeTrigger(
+      for (const triggerConfig of deployTriggers) {
+        const triggerRes = await this.makeTrigger(
           fcClient,
           triggerConfig.service,
           triggerConfig.function,
           transfromTriggerConfig(triggerConfig, region, Client.credentials.AccountID),
         );
-      };
-
-      if (commandIsTirgger && onlyDelpoyTriggerName) {
-        for (const triggerConfig of triggers) {
-          if (triggerConfig.name === onlyDelpoyTriggerName) {
-            return {
-              triggers: [await deployOneTrigger(triggerConfig)],
-            };
-          }
-        }
-        throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);
-      }
-      for (const triggerConfig of triggers) {
-        triggersRes.push(await deployOneTrigger(triggerConfig));
+        triggersRes.push(triggerRes);
       }
       deployRes.triggers = triggersRes;
     }

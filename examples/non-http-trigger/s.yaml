@@ -1,11 +1,11 @@
-edition: 1.0.0          #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
-name: fcBaseApp         #  项目名称
-access: aliyun-release  #  秘钥别名
+edition: 1.0.0
+name: fcBaseApp
+access: aliyun-release
 
 services:
-  fc-base-test: #  服务名称
-    component: /Users/wb447188/Desktop/sdk  # 组件名称
-    props: #  组件的属性值
+  fc-base-test:
+    component: ${path(../..)}
+    props:
       region: cn-shenzhen
       service:
         name: qianfeng-fc-base-component-service
