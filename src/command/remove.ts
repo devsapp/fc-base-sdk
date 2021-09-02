@@ -9,8 +9,8 @@ import { promptForConfirmOrDetails, tableShow } from '../utils/utils';
 const errorCode = ['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'];
 interface RemoveInputsProps {
   force?: boolean;
-  silent?: boolean;
-  triggerName?: string;
+  useLocal?: boolean;
+  triggerName?: string | string[];
 }
 
 export default class Component {
@@ -23,7 +23,7 @@ export default class Component {
     this.region = region;
   }
 
-  async trigger(props: IProperties, { force, silent, triggerName }: RemoveInputsProps, command?: string) {
+  async trigger(props: IProperties, { force, useLocal, triggerName }: RemoveInputsProps, command?: string) {
     if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const { service, function: functionConfig, triggers = [] } = props;
     const serviceName = service?.name || functionConfig?.service;
@@ -37,10 +37,17 @@ export default class Component {
     }
 
     if (triggerName) {
-      return await this.deleteTrigger(serviceName, functionName, triggerName);
+      if (_.isString(triggerName)) {
+        await this.deleteTrigger(serviceName, functionName, triggerName);
+      } else {
+        for (const name of triggerName) {
+          await this.deleteTrigger(serviceName, functionName, name);
+        }
+      }
+      return;
     }
 
-    if (silent || command === 'trigger') {
+    if (useLocal || command === 'trigger') {
       for (const { name } of triggers) {
         await this.deleteTrigger(serviceName, functionName, name);
       }
@@ -83,7 +90,7 @@ export default class Component {
     }
   }
 
-  async function(props: IProperties, { force, silent }: RemoveInputsProps, command?: string) {
+  async function(props: IProperties, { force, useLocal }: RemoveInputsProps, command?: string) {
     if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const serviceName = props.service?.name || props.function?.service;
     const functionName = props.function?.name || '';
@@ -91,11 +98,11 @@ export default class Component {
     if (_.isEmpty(serviceName)) {
       throw new Error('Delete function, service name cannot be empty');
     }
-    if (silent || command === 'function') {
+    if (useLocal || command === 'function') {
       if (_.isEmpty(functionName)) {
         throw new Error('Delete function, function name cannot be empty');
       }
-      await this.trigger(props, { force, silent }, 'function');
+      await this.trigger(props, { force, useLocal }, 'function');
       return await this.deleteFunction(serviceName, functionName);
     }
 
@@ -138,19 +145,19 @@ export default class Component {
         cloneProps.function.name = name;
       }
 
-      await this.trigger(cloneProps, { force, silent }, 'function');
+      await this.trigger(cloneProps, { force, useLocal }, 'function');
       await this.deleteFunction(serviceName, name);
     }
   }
 
-  async service(props: IProperties, { force, silent }: RemoveInputsProps) {
+  async service(props: IProperties, { force, useLocal }: RemoveInputsProps) {
     if (!this.fcClient) { this.fcClient = await Client.fcClient(); }
     const serviceName = props.service?.name;
     if (_.isEmpty(serviceName)) {
       throw new Error('Delete service, service name cannot be empty');
     }
 
-    await this.function(props, { force, silent }, 'service');
+    await this.function(props, { force, useLocal }, 'service');
     await this.deleteService(serviceName);
   }
 

@@ -75,3 +75,26 @@ export function transfromTriggerConfig(triggerConfig, region, accountId) {
     sourceArn: arn,
   };
 }
+
+export function getTargetTriggers(sourceTriggers: any[], onlyDelpoyTriggerName: string | string[]) {
+  let needDeployTriggers = [];
+  if (_.isString(onlyDelpoyTriggerName)) {
+    needDeployTriggers = sourceTriggers.filter(({ name }) => name === onlyDelpoyTriggerName);
+    if (_.isEmpty(needDeployTriggers)) {
+      throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);
+    }
+  } else {
+    const needDeployTriggersName = [];
+    for (const triggerConfig of sourceTriggers) {
+      if (onlyDelpoyTriggerName.includes(triggerConfig.name)) {
+        needDeployTriggers.push(triggerConfig);
+        needDeployTriggersName.push(triggerConfig.name);
+      }
+    }
+    const xor = _.xor(needDeployTriggersName, onlyDelpoyTriggerName);
+    if (!_.isEmpty(xor)) {
+      throw new Error(`Not fount trigger: ${xor.toString()}`);
+    }
+  }
+  return needDeployTriggers;
+}
