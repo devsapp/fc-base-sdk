@@ -81,7 +81,7 @@ export function getTargetTriggers(sourceTriggers: any[], onlyDelpoyTriggerName: 
   if (_.isString(onlyDelpoyTriggerName)) {
     needDeployTriggers = sourceTriggers.filter(({ name }) => name === onlyDelpoyTriggerName);
     if (_.isEmpty(needDeployTriggers)) {
-      throw new Error(`Not fount trigger: ${onlyDelpoyTriggerName}`);
+      throw new Error(`Not found trigger: ${onlyDelpoyTriggerName}`);
     }
   } else {
     const needDeployTriggersName = [];
@@ -93,7 +93,7 @@ export function getTargetTriggers(sourceTriggers: any[], onlyDelpoyTriggerName: 
     }
     const xor = _.xor(needDeployTriggersName, onlyDelpoyTriggerName);
     if (!_.isEmpty(xor)) {
-      throw new Error(`Not fount trigger: ${xor.toString()}`);
+      throw new Error(`Not found trigger: ${xor.toString()}`);
     }
   }
   return needDeployTriggers;
