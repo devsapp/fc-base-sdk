@@ -48,7 +48,18 @@ export function transfromTriggerConfig(triggerConfig, region, accountId) {
     config,
     qualifier,
     role,
+    sourceArn,
   } = triggerConfig;
+  if (_.isString(sourceArn) && !_.isNil(sourceArn)) {
+    return {
+      triggerName: name,
+      triggerType: type,
+      triggerConfig: config,
+      invocationRole: role,
+      qualifier,
+      sourceArn,
+    };
+  }
   let arn;
 
   if (type === 'oss') {
