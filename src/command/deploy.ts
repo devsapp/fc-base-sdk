@@ -118,7 +118,10 @@ export default class Component {
           },
         };
       } catch (e) {
-        throw new Error(e.message);
+        if (e.code === '40301' && e.message?.includes('AliyunARMSFullAccess')) {
+          e.message = '子账号没有访问权限,需要主账号进行授权 AliyunTracingAnalysisReadOnlyAccess';
+        }
+        throw e;
       }
     } else {
       serviceConfig.tracingConfig = {};
