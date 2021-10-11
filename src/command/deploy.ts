@@ -81,6 +81,7 @@ export default class Component {
       vpcConfig,
       nasConfig,
       logConfig,
+      role,
     } = serviceConfig;
 
     if (!logConfig) {
@@ -105,6 +106,10 @@ export default class Component {
         securityGroupId: '',
         vpcId: '',
       };
+    }
+
+    if (_.isNil(role)) {
+      serviceConfig.role = '';
     }
 
     if (serviceConfig.tracingConfig === 'Enable') {
