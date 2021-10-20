@@ -14,6 +14,7 @@ export interface ILogConfig {
   logstore: string;
   enableRequestMetrics?: boolean;
   enableInstanceMetrics?: boolean;
+  logBeginRule?: 'DefaultRegex' | 'None';
 }
 
 export interface IVpcConfig {
