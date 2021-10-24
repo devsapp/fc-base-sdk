@@ -31,11 +31,11 @@ export interface IFunctionConfig {
   instanceLifecycleConfig?: {
     preFreeze?: {
       handler?: string;
-      timeout?: string;
+      timeout?: number;
     };
     preStop?: {
       handler?: string;
-      timeout?: string;
+      timeout?: number;
     };
   };
 }
