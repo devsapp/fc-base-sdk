@@ -88,6 +88,7 @@ export default class Component {
       serviceConfig.logConfig = {
         project: '',
         logstore: '',
+        logBeginRule: 'None',
         enableRequestMetrics: false,
         enableInstanceMetrics: false,
       };
