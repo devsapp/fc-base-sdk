@@ -171,7 +171,10 @@ export default class Component {
       ossKey,
       asyncConfiguration,
       instanceLifecycleConfig,
+      environmentVariables = {},
     } = functionConfig;
+    // 接口仅接受 string 类型，value值需要toString强制转换为字符串
+    functionConfig.environmentVariables = _.mapValues(environmentVariables, (value) => value.toString());
     functionConfig.initializer = functionConfig.initializer || '';
     delete functionConfig.asyncConfiguration;
 
@@ -213,10 +216,6 @@ export default class Component {
       }
     } else if (!onlyDeployConfig && !isCode(functionConfig.code)) {
       throw new Error(`${serviceName}/${functionName} code is not configured.`);
-    }
-
-    if (functionConfig.environmentVariables) {
-      functionConfig.environmentVariables = _.mapValues(functionConfig.environmentVariables, (value) => value.toString());
     }
 
     let res;
