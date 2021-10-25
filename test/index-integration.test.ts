@@ -62,7 +62,9 @@ describe('Integration::deploy', () => {
             triggers: [mockData.HTTP_TRIGGER_NAME],
           });
     } finally {
+      console.log('deploy service with http trigger:: start deleteResource');
       await deleteResource(fcClient, mockData.SERVICE_NAME, mockData.FUNCTION_NAME, [mockData.HTTP_TRIGGER_NAME]);
+      console.log('deploy service with http trigger:: deleteResource end');
     }
   })
 
@@ -118,7 +120,7 @@ describe('Integration::deploy', () => {
         instanceType: 'c1',
         memorySize: 4096,
         initializer: '',
-        // environmentVariables: {}, // 这个预期是空对象，需要等 https://github.com/devsapp/fc-base-sdk/pull/18 合并之后才能跑通
+        environmentVariables: {},
         instanceLifecycleConfig: {
           preFreeze: { handler: '' },
           preStop: { handler: '' },
@@ -130,7 +132,9 @@ describe('Integration::deploy', () => {
         tracingConfig: { type: null },
       })).toBe(true);
     } finally {
-      await deleteResource(fcClient, mockData.SERVICE_NAME, mockData.FUNCTION_NAME, [mockData.HTTP_TRIGGER_NAME]);
+      console.log('update resource:: start deleteResource');
+      await deleteResource(fcClient, mockData.SERVICE_NAME, mockData.FUNCTION_NAME);
+      console.log('update resource:: deleteResource end');
     }
   })
 });
@@ -167,8 +171,11 @@ describe('Integration::remove', () => {
       });
 
       await expect(fcClient.getService(mockData.SERVICE_NAME)).rejects.toThrowError('404');
-    } finally {
+    } catch(e) {
+      console.error('remove all error:: ', e);
+      console.log('remove all:: start deleteResource');
       await deleteResource(fcClient, mockData.SERVICE_NAME, mockData.FUNCTION_NAME, [mockData.HTTP_TRIGGER_NAME]);
+      console.log('remove all:: start deleteResource');
     }
   })
 });

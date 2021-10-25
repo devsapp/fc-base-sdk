@@ -27,24 +27,36 @@ export function getFcClient(region: string, timeout: number) {
   });
 }
 
-export async function deleteResource(fcClient, serviceName, functionName, triggerNames) {
+export async function deleteResource(fcClient, serviceName, functionName, triggerNames?) {
   if (!isEmpty(triggerNames)) {
     for (const triggerName of triggerNames) {
+      console.log('Start remove trigger: ', triggerName);
       try {
         await fcClient.deleteTrigger(serviceName, functionName, triggerName);
-      } catch (_e) {}
+        console.log('Remove trigger successed');
+      } catch (e) {
+        console.error('Remove trigger faild: ', e);
+      }
     }
   }
 
   if (functionName) {
+    console.log('Start remove function: ', functionName);
     try {
       await fcClient.deleteFunction(serviceName, functionName);
-    } catch (_e) {}
+      console.log('Remove function successed');
+    } catch (e) {
+      console.error('Remove function faild: ', e);
+    }
   }
 
   try {
+    console.log('Start remove service: ', serviceName);
     await fcClient.deleteService(serviceName);
-  } catch (_e) {}
+    console.log('Remove service successed');
+  } catch (e) {
+    console.error('Remove service faild: ', e);
+  }
   
 }
 
