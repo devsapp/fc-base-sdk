@@ -9,7 +9,7 @@ export const MOCK_PROJECT_PATH: string = path.join(__dirname, 'mock-project');
 export const MOCK_PROJECT_YAML_PATH: string = path.join(MOCK_PROJECT_PATH, 's.yaml');
 export const DEFAULT_CLIENT_TIMEOUT = 600 * 1000;
 
-export const SERVICE_NAME = `test-service-${Math.random().toString(36).substr(2)}`;
+export const SERVICE_NAME = `s-fc-base-sdk-ci-${new Date().getTime()}-${Math.random().toString(36).substr(2)}`;
 export const FUNCTION_NAME = 'testFunction';
 export const HTTP_TRIGGER_NAME = 'httpTrigger';
 
