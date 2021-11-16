@@ -16,6 +16,7 @@ package-lok.json
 .vscode
 .DS_Store
 .git
+.env
 
 README.md
 ./examples

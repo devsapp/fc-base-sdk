@@ -8,49 +8,55 @@
 # s.yml
 
 ````
-Test:
-  Component: web-*?
-  Provider: alibaba
-  Access: wss
-  Properties:
-    region: cn-shenzhen
-    service:
-      name: zblog
-      # logConfig: Auto
-      # description: 测试环节
-    function:
-      # name: zblog
-      # runtime: nodejs12
-      # description: 测试环节
-      customContainerConfig:
-        image: registry.cn-shenzhen.aliyuncs.com/test-wss/nodejs12:v0.1
-        command: '["node", "index.js"]'
-        # args: '["--port", "9000"]'
-      # caPort: 9000
-      code:
-        src: ./src
-        excludes:
-          - package-lock.json
-    # trigger:
-    #   name: def
-    #   type: http
-    #   config:
-    #     authType: anonymous
-    #     methods:
-    #       - GET
-    #       - POST
-    #       - PUT
-    customDomains:
-      - domainName: Auto
-        protocol: HTTP
-        routeConfigs:
-          - path: '/*'
-      # - domainName: test.shoushuai.top
-      #   protocol: HTTP,HTTPS
-      #   routeConfigs:
-      #     - path: '/'
-      #   certConfig:
-      #     certName: test
-      #     certificate: ./certConfigCutom/cate.pem
-      #     privateKey: ./certConfigCutom/key.pem
+edition: 1.0.0 
+name: fcBaseApp   
+access: default
+
+services:
+  fc-base-test:
+    component: devsapp/fc-base-sdk
+    props:
+      region: cn-shenzhen
+      service:
+        name: fc-base-service
+      function:
+        name: test-function
+        service: fc-base-service
+        filename: './code.zip'
+        handler: 'index.handler'
+        memorySize: 128
+        runtime: nodejs12
+        timeout: 60
+      triggers:
+        - name: httpTrigger
+          function: test-function
+          service: fc-base-service
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+  fc-base-test-1:
+    component: ${path(../..)}
+    props:
+      region: cn-shenzhen
+      service:
+        name: fc-base-service
+      function:
+        name: test-function
+        service: fc-base-service
+        filename: './code.zip'
+        handler: 'index.handler'
+        memorySize: 128
+        runtime: nodejs12
+        timeout: 60
+      triggers:
+        - name: httpTrigger
+          function: test-function
+          service: fc-base-service
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
 ````
