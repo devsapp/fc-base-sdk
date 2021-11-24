@@ -174,7 +174,7 @@ export default class Component {
       environmentVariables = {},
     } = functionConfig;
     // 接口仅接受 string 类型，value值需要toString强制转换为字符串
-    functionConfig.environmentVariables = _.mapValues(environmentVariables, (value) => value.toString());
+    functionConfig.environmentVariables = _.mapValues(environmentVariables, (value) => value?.toString());
     functionConfig.initializer = functionConfig.initializer || '';
     delete functionConfig.asyncConfiguration;
 
