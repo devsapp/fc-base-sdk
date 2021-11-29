@@ -57,7 +57,7 @@ export default class Component {
 
     await this.logger.task('Creating', [
       {
-        title: `Creating Service ${service.name}...`,
+        title: `Creating Service ${service?.name}...`,
         id: 'Service',
         enabled: needDeployService,
         task: async () => {
@@ -65,7 +65,7 @@ export default class Component {
         },
       },
       {
-        title: `Creating Function ${functionConfig.service}/${functionConfig.name}...`,
+        title: `Creating Function ${functionConfig?.service}/${functionConfig?.name}...`,
         id: 'Function',
         enabled: needDeployFunction && functionConfig,
         task: async () => {

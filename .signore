@@ -1,9 +1,10 @@
 node_modules
+src
 .s
 tsconfig.json
 tsconfig.base.json
 LICENSE
-package-lok.json
+package-lock.json
 .prettierrc.js
 .prettierignore
 .eslintrc.js
@@ -19,6 +20,7 @@ package-lok.json
 .env
 
 README.md
+readme.md
 ./examples
 ./test
 ./Makefile
