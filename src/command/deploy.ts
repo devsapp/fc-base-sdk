@@ -67,13 +67,13 @@ export default class Component {
       {
         title: `Creating Function ${functionConfig?.service}/${functionConfig?.name}...`,
         id: 'Function',
-        enabled: needDeployFunction && functionConfig,
+        enabled: needDeployFunction && Boolean(functionConfig),
         task: async () => {
           deployRes.function = await this.makeFunction(fcClient, functionConfig, type);
         },
       },
       {
-        title: `Creating Trigger...`,
+        title: 'Creating Trigger...',
         id: 'Trigger',
         enabled: !_.isEmpty(deployTriggers),
         task: async () => {
@@ -154,11 +154,7 @@ export default class Component {
         this.logger.debug(`ex code: ${ex.code}, ex: ${ex.message}`);
         throw ex;
       }
-      try {
-        res = await fcClient.updateService(name, serviceConfig);
-      } catch (e) {
-        throw e;
-      }
+      res = await fcClient.updateService(name, serviceConfig);
     }
 
     return res;
@@ -182,8 +178,7 @@ export default class Component {
     } = functionConfig;
     // 接口仅接受 string 类型，value值需要toString强制转换为字符串
     functionConfig.environmentVariables = _.mapValues(environmentVariables, (value) =>
-      value.toString(),
-    );
+      value.toString());
     functionConfig.initializer = functionConfig.initializer || '';
     delete functionConfig.asyncConfiguration;
 
@@ -200,11 +195,7 @@ export default class Component {
       }
 
       if (onlyDeployCode) {
-        try {
-          await fcClient.updateFunction(serviceName, functionName, { code: functionConfig.code });
-        } catch (ex) {
-          throw ex;
-        }
+        await fcClient.updateFunction(serviceName, functionName, { code: functionConfig.code });
         return;
       }
     }
@@ -236,11 +227,7 @@ export default class Component {
         throw ex;
       }
       functionConfig.functionName = functionName;
-      try {
-        res = await fcClient.createFunction(serviceName, functionConfig);
-      } catch (e) {
-        throw e;
-      }
+      res = await fcClient.createFunction(serviceName, functionConfig);
     }
 
     let asyncWarn = '';
