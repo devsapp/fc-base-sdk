@@ -25,6 +25,7 @@ export const tableShow = (data, showKey) => {
     value,
   }) : ({ ...header_option, ...value })));
 
+  // eslint-disable-next-line no-console
   console.log(Table(header, data, options).render());
 };
 

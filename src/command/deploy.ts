@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable require-atomic-updates */
 import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
 import _ from 'lodash';

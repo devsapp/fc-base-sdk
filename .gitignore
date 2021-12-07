@@ -13,6 +13,7 @@ download
 lib
 .vscode
 .cache
+.env
 package-lock.json
 !**/src/lib
 .env

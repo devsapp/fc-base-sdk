@@ -8,11 +8,11 @@ services:
     props:
       region: cn-shenzhen
       service:
-        name: qianfeng-fc-base-component-service
-        role: acs:ram::xxx:role/qianfeng-fc-deploy-test-role
+        name: fc-base-component-service
+        role: acs:ram::xxx:role/fc-deploy-test-role
       function:
         name: fc-base-component-function-two
-        service: qianfeng-fc-base-component-service
+        service: fc-base-component-service
         filename: './code.zip'
         handler: 'index.handler'
         memorySize: 128
@@ -23,7 +23,7 @@ services:
       triggers:
         - name: timerTrigger
           function: fc-base-component-function-two
-          service: qianfeng-fc-base-component-service
+          service: fc-base-component-service
           type: timer
           config:
             cronExpression: '0 0 8 * * *'
@@ -31,9 +31,9 @@ services:
             payload: 'awesome-fc'
         - name: ossTrigger
           function: fc-base-component-function-two
-          service: qianfeng-fc-base-component-service
+          service: fc-base-component-service
           type: oss
-          role: acs:ram::xxx:role/qianfeng-fc-base-role
+          role: acs:ram::xxx:role/fc-base-role
           config:
             bucketName: fassdemo
             events:
@@ -45,9 +45,9 @@ services:
                 Suffix: .png
         - name: logTrigger
           function: fc-base-component-function-two
-          service: qianfeng-fc-base-component-service
+          service: fc-base-component-service
           type: log
-          role: acs:ram::xxx:role/qianfeng-fc-base-role
+          role: acs:ram::xxx:role/fc-base-role
           config:
             logConfig:
               project: fass-demo
@@ -62,9 +62,9 @@ services:
             enable: true
         - name: mnsTrigger
           function: fc-base-component-function-two
-          service: qianfeng-fc-base-component-service
+          service: fc-base-component-service
           type: mns_topic
-          role: acs:ram::xxx:role/qianfeng-fc-base-role
+          role: acs:ram::xxx:role/fc-base-role
           config:
             topicName: test-topic
             region: cn-hangzhou
@@ -72,9 +72,9 @@ services:
             notifyStrategy: 'BACKOFF_RETRY'
         - name: cdnTrigger
           function: fc-base-component-function-two
-          service: qianfeng-fc-base-component-service
+          service: fc-base-component-service
           type: cdn_events
-          role: acs:ram::xxx:role/qianfeng-fc-base-role
+          role: acs:ram::xxx:role/fc-base-role
           config:
             eventName: LogFileCreated
             eventVersion: '1.0.0'

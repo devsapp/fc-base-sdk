@@ -26,26 +26,3 @@ services:
             authType: anonymous
             methods:
               - GET
-  fc-base-test-1:
-    component: ${path(../..)}
-    props:
-      region: cn-shenzhen
-      service:
-        name: fc-base-service
-      function:
-        name: test-function-1
-        service: fc-base-service
-        filename: './code.zip'
-        handler: 'index.handler'
-        memorySize: 128
-        runtime: nodejs12
-        timeout: 60
-      triggers:
-        - name: httpTrigger
-          function: test-function-1
-          service: fc-base-service
-          type: http
-          config:
-            authType: anonymous
-            methods:
-              - GET
