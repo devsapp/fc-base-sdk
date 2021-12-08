@@ -27,6 +27,7 @@ export const tableShow = (data, showKey) => {
     value,
   }) : ({ ...header_option, ...value })));
 
+  // eslint-disable-next-line no-console
   console.log(Table(header, data, options).render());
 };
 
@@ -69,10 +70,7 @@ export function transfromTriggerConfig(triggerConfig, region, accountId) {
   } else if (type === 'log') {
     arn = `acs:log:${region}:${accountId}:project/${config.logConfig.project}`;
   } else if (type === 'mns_topic') {
-    if (config.region) {
-      arn = `acs:mns:${region}:${accountId}:/topics/${config.topicName}`;
-    }
-    arn = `acs:mns:${region}:${accountId}:/topics/${config.topicName}`;
+    arn = `acs:mns:${config.region ? config.region : region}:${accountId}:/topics/${config.topicName}`;
   } else if (type === 'cdn_events') {
     arn = `acs:cdn:*:${accountId}`;
   } else if (type === 'tablestore') {
@@ -110,4 +108,32 @@ export function getTargetTriggers(sourceTriggers: any[], onlyDelpoyTriggerName: 
     }
   }
   return needDeployTriggers;
+}
+
+/**
+ * 深度遍历转化为字符串类型
+ * @param source object
+ * @returns object
+ */
+export function objectDeepTransfromString(source) {
+  if (_.isArray(source)) {
+    return source.map((value) => {
+      if (typeof value === 'object') {
+        return objectDeepTransfromString(value);
+      }
+      return value?.toString();
+    });
+  }
+
+  if (_.isObject(source)) {
+    return _.mapValues(source, (value) => {
+      if (typeof value === 'object') {
+        return objectDeepTransfromString(value);
+      }
+      // @ts-ignore 不是 object 类型尝试 toString 强制转换为字符串
+      return value?.toString();
+    });
+  }
+
+  return source;
 }

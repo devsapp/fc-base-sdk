@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable require-atomic-updates */
 import { ILogger, HLogger, spinner, getState, setState } from '@serverless-devs/core';
 import _ from 'lodash';
 import Client from '../utils/client';
