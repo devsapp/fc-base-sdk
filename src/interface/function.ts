@@ -38,6 +38,14 @@ export interface IFunctionConfig {
       timeout?: number;
     };
   };
+  customDNS?: {
+    nameServers?: string[] | null;
+    searches?: string[] | null;
+    dnsOptions?: Array<{
+      name: string;
+      value: string;
+    }> | null;
+  };
 }
 
 export interface ICustomContainerConfig {

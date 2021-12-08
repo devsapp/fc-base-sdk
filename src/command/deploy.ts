@@ -2,7 +2,7 @@ import { ILogger, HLogger, spinner } from '@serverless-devs/core';
 import fs from 'fs';
 import _ from 'lodash';
 import Client from '../utils/client';
-import { getTargetTriggers, transfromTriggerConfig } from '../utils/utils';
+import { getTargetTriggers, transfromTriggerConfig, objectDeepTransfromString } from '../utils/utils';
 import { IProperties } from '../common/entity';
 import { isCode, isCustomContainerConfig } from '../interface/function';
 import { makeDestination } from './function-async-config';
@@ -73,14 +73,15 @@ export default class Component {
     return deployRes;
   }
 
-  static async makeService(fcClient, serviceConfig) {
+  static async makeService(fcClient, sourceServiceConfig) {
     const {
       name,
       vpcConfig,
       nasConfig,
       logConfig,
       role,
-    } = serviceConfig;
+    } = sourceServiceConfig;
+    const serviceConfig = _.cloneDeep(sourceServiceConfig);
 
     if (!logConfig) {
       serviceConfig.logConfig = {
@@ -154,7 +155,8 @@ export default class Component {
     return res;
   }
 
-  static async makeFunction(fcClient, functionConfig, type) {
+  static async makeFunction(fcClient, sourceFunctionConfig, type) {
+    const functionConfig = _.cloneDeep(sourceFunctionConfig);
     const serviceName = functionConfig.service;
     const functionName = functionConfig.name;
     const vm = spinner(`Make function ${serviceName}/${functionName}...`);
@@ -169,8 +171,9 @@ export default class Component {
       ossKey,
       asyncConfiguration,
       instanceLifecycleConfig,
+      customDNS,
       environmentVariables = {},
-    } = functionConfig;
+    } = sourceFunctionConfig;
     // 接口仅接受 string 类型，value值需要toString强制转换为字符串
     functionConfig.environmentVariables = _.mapValues(environmentVariables, (value) => value?.toString());
     functionConfig.initializer = functionConfig.initializer || '';
@@ -208,6 +211,13 @@ export default class Component {
       preStop: instanceLifecycleConfig?.preStop || emptyProp,
     };
 
+    if (_.isEmpty(customDNS)) {
+      functionConfig.customDNS = { nameServers: null, searches: null, dnsOptions: null };
+    } else {
+      // 接口仅接受 string 类型，value值需要toString强制转换为字符串
+      functionConfig.customDNS = objectDeepTransfromString(customDNS);
+    }
+
     if (runtime === 'custom-container') {
       if (!isCustomContainerConfig(customContainerConfig)) {
         throw new Error(`${serviceName}/${functionName} runtime is custom-container, but customContainerConfig is not configured.`);
@@ -217,6 +227,7 @@ export default class Component {
     }
 
     let res;
+    this.logger.debug(`handler function config: ${JSON.stringify(functionConfig, null, 2)}`);
     try {
       res = await fcClient.updateFunction(serviceName, functionName, functionConfig);
     } catch (ex) {
@@ -263,6 +274,7 @@ export default class Component {
 
     const vm = spinner(`Make trigger ${serviceName}/${functionName}/${triggerName}...`);
     if (triggerConfig.qualifier) {
+      // eslint-disable-next-line no-param-reassign
       triggerConfig.qualifier = triggerConfig.qualifier.toString();
     }
 
