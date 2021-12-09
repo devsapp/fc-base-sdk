@@ -63,7 +63,7 @@ export default class Component {
       {
         title: `Creating Service ${service?.name}...`,
         id: 'Service',
-        enabled: needDeployService,
+        enabled: () => needDeployService,
         task: async () => {
           deployRes.service = await this.makeService(fcClient, service);
         },
@@ -71,7 +71,7 @@ export default class Component {
       {
         title: `Creating Function ${functionConfig?.service}/${functionConfig?.name}...`,
         id: 'Function',
-        enabled: needDeployFunction && Boolean(functionConfig),
+        enabled: () => needDeployFunction && Boolean(functionConfig),
         task: async () => {
           deployRes.function = await this.makeFunction(fcClient, functionConfig, type);
         },
@@ -79,7 +79,7 @@ export default class Component {
       {
         title: 'Creating Trigger...',
         id: 'Trigger',
-        enabled: !_.isEmpty(deployTriggers),
+        enabled: () => !_.isEmpty(deployTriggers),
         task: async () => {
           const triggersRes = [];
           for (const triggerConfig of deployTriggers) {
