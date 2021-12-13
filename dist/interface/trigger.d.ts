@@ -4,7 +4,7 @@ export interface ITriggerConfig {
     service?: string;
     type: 'oss' | 'log' | 'timer' | 'http' | 'mns_topic' | 'cdn_events' | 'tablestore';
     qualifier?: string;
-    role: string;
+    role?: string;
     sourceArn?: string;
     config: OssTriggerConfig | LogTriggerConfig | TimerTriggerConfig | HttpTriggerConfig | MnsTriggerConfig | CdnTriggerConfig | OtsConfig;
 }

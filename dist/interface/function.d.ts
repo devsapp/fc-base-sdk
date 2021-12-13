@@ -31,12 +31,20 @@ export interface IFunctionConfig {
     instanceLifecycleConfig?: {
         preFreeze?: {
             handler?: string;
-            timeout?: string;
+            timeout?: number;
         };
         preStop?: {
             handler?: string;
-            timeout?: string;
+            timeout?: number;
         };
+    };
+    customDNS?: {
+        nameServers?: string[] | null;
+        searches?: string[] | null;
+        dnsOptions?: Array<{
+            name: string;
+            value: string;
+        }> | null;
     };
 }
 export interface ICustomContainerConfig {

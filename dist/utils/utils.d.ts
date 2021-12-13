@@ -10,3 +10,9 @@ export declare function transfromTriggerConfig(triggerConfig: any, region: any, 
     sourceArn: any;
 };
 export declare function getTargetTriggers(sourceTriggers: any[], onlyDelpoyTriggerName: string | string[]): any[];
+/**
+ * 深度遍历转化为字符串类型
+ * @param source object
+ * @returns object
+ */
+export declare function objectDeepTransfromString(source: any): any;

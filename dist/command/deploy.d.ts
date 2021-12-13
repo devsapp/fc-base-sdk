@@ -16,7 +16,7 @@ export default class Component {
         type: any;
         onlyDelpoyTriggerName: any;
     }): Promise<any>;
-    static makeService(fcClient: any, serviceConfig: any): Promise<any>;
-    static makeFunction(fcClient: any, functionConfig: any, type: any): Promise<any>;
+    static makeService(fcClient: any, sourceServiceConfig: any): Promise<any>;
+    static makeFunction(fcClient: any, sourceFunctionConfig: any, type: any): Promise<any>;
     static makeTrigger(fcClient: any, serviceName: any, functionName: any, triggerConfig: any): Promise<any>;
 }
