@@ -78,7 +78,7 @@ export default class Component {
       },
       {
         title: 'Creating Trigger...',
-        id: 'Trigger',
+        id: 'Triggers',
         enabled: () => !_.isEmpty(deployTriggers),
         task: async () => {
           const triggersRes = [];
