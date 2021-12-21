@@ -1,6 +1,8 @@
-import inquirer from 'inquirer';
+import * as core from '@serverless-devs/core';
 import _ from 'lodash';
 import Table from 'tty-table';
+
+const { inquirer } = core;
 
 
 export const tableShow = (data, showKey) => {

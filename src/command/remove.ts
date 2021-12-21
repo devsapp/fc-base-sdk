@@ -58,7 +58,7 @@ export default class Component {
     const listTriggerNames = listTrigger.map((item) => item.triggerName);
 
     if (force) {
-      deleteTriggerList = Array.from(yamlTriggerNames.concat(listTriggerNames));
+      deleteTriggerList = listTriggerNames;
     } else {
       const showTip = {
         prompt: `${serviceName}/${functionName} has triggers outside the configuration, delete all?`,
@@ -189,7 +189,7 @@ export default class Component {
       vm.succeed(`Delete function ${serviceName}/${functionName} success.`);
 
       this.removeNameList.functions || (this.removeNameList.functions = []);
-      this.removeNameList.functions.push(functionName);
+      this.removeNameList.functions.push({ service: serviceName, function: functionName });
 
       const stateId = `${this.fcClient.accountid}-${this.region}-${serviceName}-${functionName}`;
       await this.unsetState(stateId);
@@ -209,7 +209,7 @@ export default class Component {
       vm.succeed(`Delete trigger ${serviceName}/${functionName}/${triggerName} success.`);
 
       this.removeNameList.triggers || (this.removeNameList.triggers = []);
-      this.removeNameList.triggers.push(triggerName);
+      this.removeNameList.triggers.push({ service: serviceName, function: functionName, trigger: triggerName });
 
       const stateId = `${this.fcClient.accountid}-${this.region}-${serviceName}-${functionName}-${triggerName}`;
       await this.unsetState(stateId);
